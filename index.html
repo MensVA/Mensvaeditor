@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="es" class="dark scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MENSVA EDITOR | Video Editor & Motion Designer</title>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+/* ===================== TOKENS — PALETA PANTONE ===================== */
+:root{
+  --lime:#D9F500;      /* Sun Glare 13-0663 */
+  --orange:#FF4E23;    /* Exuberant Orange 17-1363 */
+  --violet:#5B2EFF;    /* Blue Violet 2725 C */
+  --paper:#F2EEE4;     /* Cloud Dancer 11-4201 */
+  --ink:#18171B;       /* Darkest Hour 20-0199 */
+
+  --mat:#18171B;
+  --mat-line:rgba(217,245,0,.14);
+  --mat-line-2:rgba(217,245,0,.055);
+  --txt:#F2EEE4;
+  --muted:#9B978E;
+  --border:rgba(242,238,228,.22);
+  --soft:rgba(242,238,228,.11);
+  --glass:rgba(20,19,22,.72);
+  --track-bg:rgba(242,238,228,.16);
+  --track-border:rgba(242,238,228,.42);
+
+  --accent:#D9F500;
+  --accent-2:#5B2EFF;
+  --accent-3:#FF4E23;
+  --fill:#D9F500;
+  --fill-txt:#18171B;
+  --shadow-obj:0 14px 26px rgba(0,0,0,.6), 0 3px 6px rgba(0,0,0,.45);
+  --glow:0 0 26px rgba(217,245,0,.3);
+
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html.light{
+  --mat:#F2EEE4;
+  --mat-line:rgba(91,46,255,.14);
+  --mat-line-2:rgba(91,46,255,.06);
+  --txt:#18171B;
+  --muted:#6B665C;
+  --border:rgba(24,23,27,.14);
+  --soft:rgba(24,23,27,.045);
+  --glass:rgba(255,255,255,.82);
+  --track-bg:rgba(24,23,27,.08);
+  --track-border:rgba(24,23,27,.4);
+
+  --accent:#5B2EFF;
+  --accent-2:#5B2EFF;
+  --accent-3:#FF4E23;
+  --fill:#5B2EFF;
+  --fill-txt:#FFFFFF;
+  --shadow-obj:0 12px 22px rgba(0,0,0,.16), 0 2px 5px rgba(0,0,0,.10);
+  --glow:0 10px 28px rgba(91,46,255,.25);
+}
+
+*{font-family:'Archivo',system-ui,sans-serif}
+html,body{background:var(--mat);color:var(--txt)}
+body{transition:background .45s ease,color .45s ease}
+.display{font-family:'Archivo Black',sans-serif;letter-spacing:-.02em}
+.mono{font-family:'JetBrains Mono',monospace}
+
+.mat-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background-color:var(--mat);
+  background-image:
+    repeating-linear-gradient(0deg,var(--mat-line) 0 1px,transparent 1px 64px),
+    repeating-linear-gradient(90deg,var(--mat-line) 0 1px,transparent 1px 64px),
+    repeating-linear-gradient(0deg,var(--mat-line-2) 0 1px,transparent 1px 16px),
+    repeating-linear-gradient(90deg,var(--mat-line-2) 0 1px,transparent 1px 16px);
+  transition:background-color .45s ease;
+}
+.ruler-x{position:fixed;z-index:1;pointer-events:none;opacity:.5;top:0;left:0;right:0;height:22px;background-image:repeating-linear-gradient(90deg,var(--mat-line) 0 1px,transparent 1px 32px);border-bottom:1px solid var(--border)}
+.ruler-y{position:fixed;z-index:1;pointer-events:none;opacity:.5;top:0;left:0;bottom:0;width:22px;background-image:repeating-linear-gradient(0deg,var(--mat-line) 0 1px,transparent 1px 32px);border-right:1px solid var(--border)}
+.grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.28;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E")}
+.mesh{position:fixed;width:520px;height:520px;border-radius:50%;filter:blur(150px);opacity:.2;pointer-events:none;z-index:0;animation:meshFloat 15s ease-in-out infinite alternate}
+@keyframes meshFloat{0%{transform:translate(0,0) scale(1)}50%{transform:translate(80px,50px) scale(1.15)}100%{transform:translate(-50px,80px) scale(.92)}}
+
+.paper{position:relative;color:var(--ink)}
+.paper>*{position:relative;z-index:1}
+.paper::before{content:"";position:absolute;inset:0;z-index:0;background:var(--paper);filter:url(#torn) drop-shadow(0 12px 18px rgba(0,0,0,.45))}
+.paper-lime::before{background:var(--lime)}
+.paper-violet::before{background:var(--violet)}
+.paper-violet{color:#F2EEE4}
+.paper-orange::before{background:var(--orange)}
+.paper-orange{color:#18171B}
+.paper-ink::before{background:#18171B}
+.paper-ink{color:#F2EEE4}
+
+.tape{position:absolute;width:104px;height:30px;z-index:5;background:repeating-linear-gradient(45deg,rgba(217,245,0,.85) 0 7px,rgba(217,245,0,.6) 7px 14px);box-shadow:0 3px 8px rgba(0,0,0,.4);clip-path:polygon(2% 8%,98% 0,100% 88%,4% 100%)}
+.tape-v{background:repeating-linear-gradient(45deg,rgba(91,46,255,.9) 0 7px,rgba(91,46,255,.65) 7px 14px)}
+.tape-o{background:repeating-linear-gradient(45deg,rgba(255,78,35,.9) 0 7px,rgba(255,78,35,.65) 7px 14px)}
+.tape-w{background:repeating-linear-gradient(45deg,rgba(242,238,228,.9) 0 7px,rgba(242,238,228,.65) 7px 14px)}
+
+.pin{position:absolute;width:20px;height:20px;border-radius:50%;z-index:6;background:radial-gradient(circle at 34% 30%,#fff 0 12%,var(--lime) 14% 70%,#7E9700 100%);box-shadow:0 5px 10px rgba(0,0,0,.55)}
+.pin-violet{background:radial-gradient(circle at 34% 30%,#fff 0 12%,var(--violet) 14% 70%,#2A0FA0 100%)}
+.pin-orange{background:radial-gradient(circle at 34% 30%,#fff 0 12%,var(--orange) 14% 70%,#B02D0F 100%)}
+
+.dymo{display:inline-block;background:#18171B;color:#F2EEE4;font-family:'JetBrains Mono',monospace;font-weight:700;text-transform:uppercase;letter-spacing:.2em;font-size:10px;padding:5px 12px;border-radius:4px;box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 3px 7px rgba(0,0,0,.5)}
+.dymo-lime{background:var(--lime);color:#18171B}
+.dymo-violet{background:var(--violet);color:#F2EEE4}
+.dymo-orange{background:var(--orange);color:#18171B}
+
+.r-1{transform:rotate(-1.6deg)}.r-2{transform:rotate(1.3deg)}.r-3{transform:rotate(-2.6deg)}.r-4{transform:rotate(2.2deg)}.r-5{transform:rotate(-.8deg)}
+
+.obj{position:absolute;filter:drop-shadow(0 16px 20px rgba(0,0,0,.5));z-index:1}
+html.light .obj{filter:drop-shadow(0 10px 14px rgba(0,0,0,.2))}
+
+.muted{color:var(--muted)}
+.accent{color:var(--accent)}
+.bordr{border:1px solid var(--border)}
+.bordr-t{border-top:1px solid var(--border)}
+.soft{background:var(--soft)}
+.glass{background:var(--glass);border:1px solid var(--border);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%)}
+.btn-fill{background:var(--fill);color:var(--fill-txt);box-shadow:var(--shadow-obj)}
+.ring-accent{border-color:var(--accent)!important}
+img,video{background:linear-gradient(135deg,rgba(217,245,0,.16),rgba(91,46,255,.26))}
+
+.grad-text{background:linear-gradient(90deg,var(--lime),var(--violet),var(--orange),var(--lime));background-size:280% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:gradSlide 8s linear infinite}
+html.light .grad-text{background:linear-gradient(90deg,var(--violet),var(--orange),var(--violet));background-size:250% 100%;-webkit-background-clip:text;background-clip:text}
+@keyframes gradSlide{to{background-position:280% 0}}
+.grad-border{position:relative;isolation:isolate}
+.grad-border::before{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;background:conic-gradient(from var(--ang),transparent 0 58%,var(--lime) 70%,var(--violet) 82%,var(--orange) 92%,transparent 100%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .4s;z-index:-1;animation:angSpin 4s linear infinite}
+@property --ang{syntax:'<angle>';initial-value:0deg;inherits:false}
+@keyframes angSpin{to{--ang:360deg}}
+
+.reveal{opacity:0;transform:translateY(34px) rotate(var(--rr,0deg));transition:opacity .75s cubic-bezier(.16,1,.3,1),transform .75s cubic-bezier(.16,1,.3,1)}
+.reveal.on{opacity:1;transform:translateY(0) rotate(var(--rr,0deg))}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}
+.snap-x{scroll-snap-type:x mandatory}.snap-item{scroll-snap-align:start}
+.no-bar::-webkit-scrollbar{display:none}.no-bar{-ms-overflow-style:none;scrollbar-width:none}
+.marquee{overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+.marquee-track{display:flex;gap:2.5rem;width:max-content;animation:slideLeft 24s linear infinite}
+@keyframes slideLeft{to{transform:translateX(-50%)}}
+
+.scene{perspective:1100px}
+.tilt{transform-style:preserve-3d;transition:transform .5s cubic-bezier(.16,1,.3,1),box-shadow .5s}
+.tilt .depth{transform:translateZ(42px)}
+
+.ico-box{transition:transform .45s cubic-bezier(.34,1.56,.64,1)}
+.blade-t,.blade-b{transition:transform .25s cubic-bezier(.34,1.56,.64,1);transform-origin:20% 50%}
+.ico-play{transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
+.spin-slow{animation:spin 9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.knob-spin{animation:spin 6s linear infinite;transform-origin:center}
+.reel-spin{animation:spin 5s linear infinite;transform-origin:center}
+
+.mi{position:relative;overflow:hidden;transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+.mi:active{transform:scale(.95)}
+.mi::after{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.4),transparent 55%);opacity:0;transition:opacity .35s}
+.nav-link{position:relative}
+.nav-link::after{content:"";position:absolute;left:0;bottom:-5px;height:3px;width:100%;background:var(--accent);transform:scaleX(0);transform-origin:right;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+
+/* Efectos :hover SOLO en dispositivos con puntero fino (mouse). En táctil (celular)
+   Safari/Chrome dejan el :hover "pegado" tras un tap y no se suelta hasta tocar otro
+   elemento, lo que tapaba textos con el velo blanco de .mi o desplazaba tarjetas.
+   Por eso en móvil estos efectos se desactivan por completo y solo queda :active. */
+@media (hover:hover) and (pointer:fine){
+  .grad-border:hover::before{opacity:1}
+  .marquee:hover .marquee-track{animation-play-state:paused}
+  .ico-card:hover .ico-box{transform:translateY(-6px) rotate(-9deg) scale(1.1)}
+  .scissors:hover .blade-t{transform:rotate(-20deg)}
+  .scissors:hover .blade-b{transform:rotate(20deg)}
+  .group:hover .ico-play{transform:scale(1.2)}
+  .mi:hover{transform:translateY(-3px) scale(1.03) rotate(-.6deg)}
+  .mi:hover::after{opacity:.45}
+  .nav-link:hover::after{transform:scaleX(1);transform-origin:left}
+  .nav-link:hover{color:var(--accent)}
+}
+
+.mascot{animation:bob 3.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-11px) rotate(3deg)}}
+.eye{transform-origin:center;animation:blink 4.2s infinite}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.08)}}
+.mascot-arm{transform-origin:top center;animation:wave 2.6s ease-in-out infinite}
+@keyframes wave{0%,100%{transform:rotate(0)}50%{transform:rotate(20deg)}}
+
+.eq{animation:eqB 1.1s ease-in-out infinite alternate}
+.eq:nth-child(2){animation-delay:.18s}.eq:nth-child(3){animation-delay:.36s}.eq:nth-child(4){animation-delay:.54s}
+@keyframes eqB{0%{height:4px}100%{height:22px}}
+
+/* Slider propio: track+fill+thumb dibujados con divs, siempre visibles en
+   cualquier navegador/visor (no depende de que el input nativo pinte bien). */
+.slider-shell{position:relative;height:28px;display:flex;align-items:center;touch-action:pan-y}
+.slider-track{position:absolute;left:0;right:0;height:10px;border-radius:5px;background:var(--track-bg);border:1.5px solid var(--track-border);overflow:hidden;pointer-events:none}
+.slider-fill{position:absolute;top:0;bottom:0;left:0;width:0%;background:var(--accent);border-radius:5px 0 0 5px}
+.slider-thumb{position:absolute;top:50%;left:0%;width:16px;height:28px;margin-top:-14px;margin-left:-8px;background:var(--paper);border:2px solid var(--ink);border-radius:4px;box-shadow:0 3px 8px rgba(0,0,0,.5);pointer-events:none}
+.slider-input{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;cursor:pointer}
+
+/* Estado inactivo de los chips de etapa (Hook/B-Roll/Motion CTA) con colores fijos
+   por tema, en vez de var() dentro de un atributo style, que no se repintaba bien. */
+.chip-idle{background:rgba(24,23,27,.06)!important;border:2px solid rgba(24,23,27,.22)!important;color:#18171B!important}
+
+/* ===================== ENTRADA ESCALONADA (sin cambios de timing) ===================== */
+@keyframes slideInL{0%{opacity:0;transform:translateX(-130px) rotate(var(--rr,0deg)) scale(.94)}72%{opacity:1;transform:translateX(6px) rotate(var(--rr,0deg)) scale(1.015)}100%{opacity:1;transform:translateX(0) rotate(var(--rr,0deg)) scale(1)}}
+@keyframes slideInR{0%{opacity:0;transform:translateX(130px) rotate(var(--rr,0deg)) scale(.94)}72%{opacity:1;transform:translateX(-6px) rotate(var(--rr,0deg)) scale(1.015)}100%{opacity:1;transform:translateX(0) rotate(var(--rr,0deg)) scale(1)}}
+@keyframes dropIn{0%{opacity:0;transform:translateY(-46px) rotate(calc(var(--rr,0deg) * 4))}70%{opacity:1;transform:translateY(4px) rotate(var(--rr,0deg))}100%{opacity:1;transform:translateY(0) rotate(var(--rr,0deg))}}
+.enter-l{opacity:0;animation:slideInL 1.15s cubic-bezier(.22,1,.36,1) forwards}
+.enter-r{opacity:0;animation:slideInR 1.15s cubic-bezier(.22,1,.36,1) forwards}
+.enter-d{opacity:0;animation:dropIn 1.05s cubic-bezier(.22,1,.36,1) forwards}
+.t1{animation-delay:.1s}.t2{animation-delay:.45s}.t3{animation-delay:.8s}
+.o1{animation-delay:.05s}.o2{animation-delay:.28s}.o3{animation-delay:.5s}.o4{animation-delay:.72s}
+
+.pixel-cursor{position:absolute;width:26px;height:26px;z-index:20;opacity:0;pointer-events:none;animation:cursorTour 5.5s cubic-bezier(.45,0,.2,1) 1.3s 1 forwards;filter:drop-shadow(0 3px 4px rgba(0,0,0,.6))}
+@keyframes cursorTour{0%{opacity:0;top:6%;left:8%}6%{opacity:1}26%{top:6%;left:60%}30%{top:6%;left:60%;transform:scale(.82)}34%{transform:scale(1)}52%{top:40%;left:20%}56%{top:40%;left:20%;transform:scale(.82)}60%{transform:scale(1)}80%{top:74%;left:55%}84%{top:74%;left:55%;transform:scale(.82)}88%{transform:scale(1)}96%{opacity:1}100%{opacity:0;top:74%;left:55%}}
+
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* ===== Carga diferida de iframes de YouTube (reel) ===== */
+(function(){
+  const fr=[...document.querySelectorAll('iframe.yt-lazy')];
+  if(!('IntersectionObserver' in window)){fr.forEach(f=>f.src=f.dataset.src);return}
+  const o=new IntersectionObserver(es=>es.forEach(e=>{const f=e.target;
+    if(e.isIntersecting){if(f.dataset.on!=='1'){f.src=f.dataset.src;f.dataset.on='1'}}
+    else if(f.dataset.on==='1'){f.src='about:blank';f.dataset.on='0'}}),{threshold:.4});
+  fr.forEach(f=>o.observe(f));
+})();
+
+/* ===== Carrusel Horizontal 16:9 ===== */
+.hc-bg{background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(91,46,255,.22),transparent 70%),repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0 1px,transparent 1px 42px),repeating-linear-gradient(90deg,rgba(255,255,255,.03) 0 1px,transparent 1px 42px)}
+html.light .hc-bg{background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(91,46,255,.10),transparent 70%),repeating-linear-gradient(0deg,rgba(0,0,0,.025) 0 1px,transparent 1px 42px),repeating-linear-gradient(90deg,rgba(0,0,0,.025) 0 1px,transparent 1px 42px)}
+.hc-viewport{position:relative;overflow:hidden;padding:10px 0 6px}
+.hc-track{display:flex;align-items:center;gap:26px;padding:0 50vw;transition:transform .6s cubic-bezier(.22,.68,.32,1);will-change:transform}
+.hc-slide{flex:0 0 auto;width:min(720px,76vw);opacity:.4;transform:scale(.85);transition:opacity .5s,transform .5s;cursor:pointer}
+.hc-slide.hc-active{opacity:1;transform:scale(1);cursor:default}
+.hc-slide .hc-play{opacity:0;transition:opacity .3s;pointer-events:none}
+.hc-slide.hc-active.hc-paused .hc-play{opacity:1;pointer-events:auto}
+.hc-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:20;width:46px;height:46px;border-radius:9999px;display:flex;align-items:center;justify-content:center;background:var(--lime);color:#18171B;border:2px solid #18171B;box-shadow:0 6px 16px rgba(0,0,0,.35);transition:transform .2s ease,filter .2s ease}
+.hc-arrow svg{stroke:#18171B}
+.hc-arrow-l{left:6px}.hc-arrow-r{right:6px}
+@media(min-width:768px){.hc-arrow-l{left:24px}.hc-arrow-r{right:24px}}
+@media(hover:hover) and (pointer:fine){.hc-arrow:hover{transform:translateY(-50%) scale(1.1);filter:brightness(1.08)}}
+.hc-arrow:active{transform:translateY(-50%) scale(.9)}
+.reel-arrow{color:#18171B;font-weight:900;font-size:18px;transition:transform .2s ease,filter .2s ease}
+@media(hover:hover) and (pointer:fine){.reel-arrow:hover{transform:scale(1.08);filter:brightness(1.1)}}
+.reel-arrow:active{transform:scale(.9)}
+.hc-dots{display:flex;justify-content:center;gap:9px;margin-top:26px}
+.hc-dot{width:8px;height:8px;border-radius:9999px;background:var(--muted);opacity:.4;transition:all .3s;cursor:pointer;border:none}
+.hc-dot.active{opacity:1;width:26px;border-radius:6px;background:var(--lime)}
+
+/* ===== Barra táctil NLE: timeline real sincronizado con el video ===== */
+.nle-track{position:relative;height:14px;width:100%;border-radius:9999px;overflow:visible;border:2px solid #18171B;background:#0d0c0f;cursor:pointer}
+.nle-seg{position:absolute;top:0;bottom:0;pointer-events:none}
+.nle-thumb{position:absolute;top:50%;left:0;width:18px;height:18px;border-radius:9999px;background:#fff;border:3px solid #18171B;transform:translate(-50%,-50%);box-shadow:0 2px 6px rgba(0,0,0,.5);cursor:grab;transition:left .05s linear}
+.nle-thumb:active{cursor:grabbing}
+.nle-btn{position:relative}
+.nle-btn.nle-btn-active{box-shadow:inset 0 0 0 3px rgba(255,255,255,.75)}
+
+/* ===== Tarjetas de Clientes ===== */
+.client-card{transition:transform .3s ease,box-shadow .3s ease;text-decoration:none}
+@media(hover:hover) and (pointer:fine){.client-card:hover{transform:translateY(-6px) rotate(var(--rr,0deg)) scale(1.05);box-shadow:0 16px 30px rgba(0,0,0,.4)}}
+.client-card:active{transform:translateY(-2px) rotate(var(--rr,0deg)) scale(.97)}
+
+/* ===== Optimización de rendimiento ===== */
+.mesh{filter:none!important;animation:none!important;opacity:.35!important;width:620px;height:620px}
+.paper::before{filter:none!important;box-shadow:0 8px 16px rgba(0,0,0,.35)}
+.glass{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(20,19,22,.94)!important}
+html.light .glass{background:rgba(242,238,228,.96)!important}
+#lightbox{backdrop-filter:none!important}
+.grad-text{animation:none!important;background-size:100% 100%!important}
+.grad-border::before{animation:none!important;display:none}
+.spin-slow,.knob-spin,.reel-spin,.mascot,.eye,.mascot-arm,.eq{animation:none!important}
+.tilt{transition:none;transform-style:flat}
+.obj{filter:none!important}
+.reveal{will-change:auto}
+.yt-box{background-size:cover;background-position:center}
+#stage-video{width:100%;height:100%;border:0}
+</style>
+<style>/* Tailwind compilado (estático) */
+*,:after,:before{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/*! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com*/*,:after,:before{box-sizing:border-box;border:0 solid #e5e7eb}:after,:before{--tw-content:""}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0}fieldset,legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::-moz-placeholder,textarea::-moz-placeholder{opacity:1;color:#9ca3af}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.visible{visibility:visible}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{inset:0}.bottom-2\.5{bottom:.625rem}.bottom-3{bottom:.75rem}.left-0{left:0}.left-3{left:.75rem}.left-4{left:1rem}.left-5{left:1.25rem}.right-0{right:0}.right-3{right:.75rem}.right-5{right:1.25rem}.top-0{top:0}.top-3{top:.75rem}.z-10{z-index:10}.z-50{z-index:50}.z-\[60\]{z-index:60}.mx-auto{margin-left:auto;margin-right:auto}.mb-1{margin-bottom:.25rem}.mb-10{margin-bottom:2.5rem}.mb-12{margin-bottom:3rem}.mb-2{margin-bottom:.5rem}.mb-3{margin-bottom:.75rem}.mb-4{margin-bottom:1rem}.mb-5{margin-bottom:1.25rem}.mb-6{margin-bottom:1.5rem}.mb-7{margin-bottom:1.75rem}.mb-8{margin-bottom:2rem}.mb-9{margin-bottom:2.25rem}.ml-0\.5{margin-left:.125rem}.ml-1{margin-left:.25rem}.ml-2{margin-left:.5rem}.mt-1{margin-top:.25rem}.mt-1\.5{margin-top:.375rem}.mt-2{margin-top:.5rem}.mt-3{margin-top:.75rem}.mt-4{margin-top:1rem}.mt-5{margin-top:1.25rem}.mt-auto{margin-top:auto}.block{display:block}.inline-block{display:inline-block}.flex{display:flex}.inline-flex{display:inline-flex}.grid{display:grid}.hidden{display:none}.aspect-\[9\/16\]{aspect-ratio:9/16}.aspect-video{aspect-ratio:16/9}.h-10{height:2.5rem}.h-11{height:2.75rem}.h-16{height:4rem}.h-20{height:5rem}.h-28{height:7rem}.h-4{height:1rem}.h-5{height:1.25rem}.h-6{height:1.5rem}.h-8{height:2rem}.h-9{height:2.25rem}.h-full{height:100%}.min-h-\[94vh\]{min-height:94vh}.w-0{width:0}.w-1\.5{width:.375rem}.w-1\/4{width:25%}.w-10{width:2.5rem}.w-11{width:2.75rem}.w-16{width:4rem}.w-2\/4{width:50%}.w-20{width:5rem}.w-28{width:7rem}.w-4{width:1rem}.w-5{width:1.25rem}.w-6{width:1.5rem}.w-60{width:15rem}.w-8{width:2rem}.w-9{width:2.25rem}.w-full{width:100%}.max-w-3xl{max-width:48rem}.max-w-4xl{max-width:56rem}.max-w-6xl{max-width:72rem}.max-w-lg{max-width:32rem}.max-w-md{max-width:28rem}.max-w-xl{max-width:36rem}.max-w-xs{max-width:20rem}.flex-shrink-0{flex-shrink:0}.transform{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.cursor-default{cursor:default}.cursor-pointer{cursor:pointer}.resize{resize:both}.snap-x{scroll-snap-type:x var(--tw-scroll-snap-strictness)}.grid-cols-1{grid-template-columns:repeat(1,minmax(0,1fr))}.grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-end{align-items:flex-end}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1{gap:.25rem}.gap-1\.5{gap:.375rem}.gap-10{gap:2.5rem}.gap-2{gap:.5rem}.gap-2\.5{gap:.625rem}.gap-3{gap:.75rem}.gap-4{gap:1rem}.gap-5{gap:1.25rem}.gap-6{gap:1.5rem}.gap-7{gap:1.75rem}.space-y-1>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(.25rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.25rem*var(--tw-space-y-reverse))}.space-y-5>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.25rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.25rem*var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.overflow-x-hidden{overflow-x:hidden}.scroll-smooth{scroll-behavior:smooth}.rounded{border-radius:.25rem}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:.5rem}.rounded-sm{border-radius:.125rem}.rounded-xl{border-radius:.75rem}.bg-black{--tw-bg-opacity:1;background-color:rgb(0 0 0/var(--tw-bg-opacity,1))}.object-cover{-o-object-fit:cover;object-fit:cover}.p-2{padding:.5rem}.p-2\.5{padding:.625rem}.p-3{padding:.75rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.p-7{padding:1.75rem}.p-9{padding:2.25rem}.px-0{padding-left:0;padding-right:0}.px-1{padding-left:.25rem;padding-right:.25rem}.px-2{padding-left:.5rem;padding-right:.5rem}.px-2\.5{padding-left:.625rem;padding-right:.625rem}.px-3{padding-left:.75rem;padding-right:.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.px-7{padding-left:1.75rem;padding-right:1.75rem}.px-8{padding-left:2rem;padding-right:2rem}.py-1{padding-top:.25rem;padding-bottom:.25rem}.py-1\.5{padding-top:.375rem;padding-bottom:.375rem}.py-10{padding-top:2.5rem;padding-bottom:2.5rem}.py-16{padding-top:4rem;padding-bottom:4rem}.py-2{padding-top:.5rem;padding-bottom:.5rem}.py-20{padding-top:5rem;padding-bottom:5rem}.py-3{padding-top:.75rem;padding-bottom:.75rem}.py-3\.5{padding-top:.875rem;padding-bottom:.875rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-5{padding-top:1.25rem;padding-bottom:1.25rem}.pb-10{padding-bottom:2.5rem}.pb-14{padding-bottom:3.5rem}.pb-20{padding-bottom:5rem}.pb-6{padding-bottom:1.5rem}.pt-3{padding-top:.75rem}.pt-36{padding-top:9rem}.pt-4{padding-top:1rem}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-5xl{font-size:3rem;line-height:1}.text-\[10px\]{font-size:10px}.text-\[11px\]{font-size:11px}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:.75rem;line-height:1rem}.font-black{font-weight:900}.font-bold{font-weight:700}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.leading-none{line-height:1}.leading-relaxed{line-height:1.625}.tracking-wide{letter-spacing:.025em}.tracking-wider{letter-spacing:.05em}.tracking-widest{letter-spacing:.1em}.opacity-0{opacity:0}.opacity-50{opacity:.5}.opacity-60{opacity:.6}.opacity-70{opacity:.7}.drop-shadow{--tw-drop-shadow:drop-shadow(0 1px 2px rgba(0,0,0,.1)) drop-shadow(0 1px 1px rgba(0,0,0,.06))}.drop-shadow,.filter{filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.transition{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,-webkit-backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter,-webkit-backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.duration-300{transition-duration:.3s}.ease-in-out{transition-timing-function:cubic-bezier(.4,0,.2,1)}.group:hover .group-hover\:w-20{width:5rem}.group:hover .group-hover\:opacity-100{opacity:1}@media (min-width:640px){.sm\:w-auto{width:auto}.sm\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.sm\:grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}.sm\:flex-row{flex-direction:row}.sm\:p-6{padding:1.5rem}.sm\:px-8{padding-left:2rem;padding-right:2rem}.sm\:text-3xl{font-size:1.875rem;line-height:2.25rem}.sm\:text-5xl{font-size:3rem;line-height:1}.sm\:text-6xl{font-size:3.75rem;line-height:1}.sm\:text-base{font-size:1rem;line-height:1.5rem}}@media (min-width:768px){.md\:block{display:block}.md\:flex{display:flex}.md\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.md\:grid-cols-5{grid-template-columns:repeat(5,minmax(0,1fr))}.md\:grid-cols-\[auto\2c 1fr\]{grid-template-columns:auto 1fr}.md\:text-7xl{font-size:4.5rem;line-height:1}}@media (min-width:1024px){.lg\:block{display:block}.lg\:grid-cols-\[1\.55fr\2c 1fr\]{grid-template-columns:1.55fr 1fr}}</style>
+</head>
+
+<body class="overflow-x-hidden" style="selection:none">
+
+<svg width="0" height="0" style="position:absolute">
+  <filter id="torn">
+    <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="4" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
+<div class="mat-bg"></div>
+<div class="ruler-x"></div>
+<div class="ruler-y"></div>
+<div class="mesh" style="background:radial-gradient(circle,rgba(217,245,0,.5),transparent 65%);top:-8%;left:-6%"></div>
+<div class="mesh" style="background:radial-gradient(circle,rgba(91,46,255,.55),transparent 65%);top:45%;right:-10%"></div>
+<div class="mesh" style="background:radial-gradient(circle,rgba(255,78,35,.4),transparent 65%);bottom:-12%;left:35%"></div>
+
+<div class="relative z-10">
+
+<!-- ============ NAVBAR ============ -->
+<header class="fixed top-0 left-0 right-0 z-50 px-4 sm:px-8" style="padding-top:calc(.75rem + env(safe-area-inset-top,0px));padding-bottom:.75rem">
+  <div class="max-w-6xl mx-auto flex items-center justify-between px-5 py-3 rounded-2xl glass grad-border" style="box-shadow:var(--shadow-obj)">
+    <a href="#" class="flex items-center gap-2.5">
+      <div class="w-9 h-9 rounded-lg flex items-center justify-center display text-sm mi" style="background:var(--lime);color:#18171B;box-shadow:var(--shadow-obj)">M</div>
+      <span class="display text-sm sm:text-base">MENSVA<span class="accent ml-1">EDITOR</span></span>
+    </a>
+    <nav class="hidden md:flex items-center gap-7 text-[11px] font-bold tracking-widest uppercase muted">
+      <a href="#showcase" class="nav-link" data-i18n="nav_work">Portafolio</a>
+      <a href="#touchbar" class="nav-link" data-i18n="nav_timeline">Timeline</a>
+      
+      <a href="#pricing" class="nav-link" data-i18n="nav_pricing">Cotizador</a>
+      <a href="#contact" class="nav-link" data-i18n="nav_contact">Contacto</a>
+    </nav>
+    <div class="flex items-center gap-2.5">
+      <button onclick="toggleLang()" class="mi px-3 py-1.5 rounded-lg text-[11px] font-bold bordr"><span id="lang-label">EN</span></button>
+      <button onclick="toggleTheme()" class="mi p-2 rounded-lg bordr" aria-label="Cambiar tema">
+        <svg id="ico-sun" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.4 6.4l-.7-.7M6.3 6.3l-.7-.7m12.7 0l-.7.7M6.3 17.7l-.7.7M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        <svg id="ico-moon" class="w-4 h-4 block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="2" d="M20.4 15.4A9 9 0 018.6 3.6 9 9 0 1020.4 15.4z"/></svg>
+      </button>
+      <a href="#pricing" class="mi px-4 py-2 rounded-lg text-[11px] font-bold btn-fill uppercase tracking-wide" data-i18n="nav_cta">Cotizar</a>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HERO COLLAGE ============ -->
+<section class="relative min-h-[94vh] flex flex-col justify-center items-center px-6 pt-36 pb-20 overflow-hidden">
+
+  <svg class="pixel-cursor hidden md:block" viewBox="0 0 24 24" fill="none">
+    <path d="M4 2l14 11-6 1.4L15 21l-3 1.4-3.4-7.2L4 19V2z" fill="#F2EEE4" stroke="#18171B" stroke-width="1.4" stroke-linejoin="round"/>
+  </svg>
+
+  <!-- ===== IZQUIERDA: teclado blanco + polaroids + mouse blanco ===== -->
+  <svg class="obj enter-l o1 hidden lg:block" style="top:14%;left:2%;width:200px;--rr:-4deg" viewBox="0 0 210 98" fill="none">
+    <defs>
+      <linearGradient id="kbBody" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#DFDCD4"/></linearGradient>
+      <linearGradient id="keyTop" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#ECEAE3"/></linearGradient>
+    </defs>
+    <rect x="4" y="14" width="200" height="78" rx="12" fill="url(#kbBody)" stroke="#C9C5BA" stroke-width="1.5"/>
+    <rect x="4" y="14" width="200" height="10" rx="6" fill="#fff" opacity=".6"/>
+    <g fill="url(#keyTop)" stroke="#C3BFB3" stroke-width="1">
+      <rect x="13" y="23" width="15" height="13" rx="3"/><rect x="31" y="23" width="15" height="13" rx="3"/><rect x="49" y="23" width="15" height="13" rx="3"/><rect x="67" y="23" width="15" height="13" rx="3"/><rect x="85" y="23" width="15" height="13" rx="3"/><rect x="103" y="23" width="15" height="13" rx="3"/><rect x="121" y="23" width="15" height="13" rx="3"/><rect x="139" y="23" width="15" height="13" rx="3"/><rect x="157" y="23" width="15" height="13" rx="3"/><rect x="175" y="23" width="24" height="13" rx="3"/>
+      <rect x="13" y="39" width="19" height="13" rx="3"/><rect x="35" y="39" width="15" height="13" rx="3"/><rect x="53" y="39" width="15" height="13" rx="3"/><rect x="71" y="39" width="15" height="13" rx="3"/><rect x="89" y="39" width="15" height="13" rx="3"/><rect x="107" y="39" width="15" height="13" rx="3"/><rect x="125" y="39" width="15" height="13" rx="3"/><rect x="143" y="39" width="15" height="13" rx="3"/><rect x="161" y="39" width="38" height="13" rx="3"/>
+      <rect x="15" y="55" width="176" height="13" rx="3"/>
+      <rect x="13" y="71" width="188" height="14" rx="4" fill="#F5F3EE"/>
+    </g>
+    <rect x="94" y="40" width="9" height="9" rx="1.5" fill="#5B2EFF" opacity=".85"/>
+    <path d="M108 92c10 9 30 11 42 5" stroke="#B7B2A5" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M150 97c8 3 16 1 22-4" stroke="#B7B2A5" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </svg>
+
+  <div class="obj enter-l o2 hidden lg:block" style="top:4%;left:24%;width:116px;--rr:-6deg">
+    <div style="background:#fff;padding:8px 8px 22px;box-shadow:var(--shadow-obj);border-radius:2px">
+      <div style="width:100px;height:80px;background:#000;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:12px;box-sizing:border-box"><img src="images/pr_logo.png" alt="Adobe Premiere Pro" style="width:100%;height:100%;object-fit:contain"></div>
+      <span style="display:block;text-align:center;font-family:'Archivo Black';font-size:9px;margin-top:6px;color:#18171B">TAKE 04</span>
+    </div>
+    <svg viewBox="0 0 40 16" style="position:absolute;top:-9px;left:38px;width:56px;transform:rotate(-8deg)"><rect width="40" height="16" fill="#FF4E23" opacity=".85"/></svg>
+  </div>
+
+  <!-- mouse blanco elegante -->
+  <svg class="obj enter-l o3 hidden lg:block" style="top:58%;left:4%;width:80px;--rr:8deg" viewBox="0 0 66 90" fill="none">
+    <defs><linearGradient id="mouseBody" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#E3E0D9"/></linearGradient></defs>
+    <ellipse cx="33" cy="46" rx="26" ry="40" fill="url(#mouseBody)" stroke="#C9C5BA" stroke-width="1.6"/>
+    <path d="M33 8v34" stroke="#C9C5BA" stroke-width="1.6"/>
+    <ellipse cx="33" cy="16" rx="6.5" ry="4.5" fill="#D9F500"/>
+    <path d="M20 48c8 5 20 5 26 0" stroke="#D6D2C6" stroke-width="1.2" fill="none"/>
+    <ellipse cx="33" cy="26" rx="14" ry="10" fill="#fff" opacity=".55"/>
+    <path d="M9 84c-5-15 2-26 16-28" stroke="#B7B2A5" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  </svg>
+
+  <!-- nota adhesiva con chincheta -->
+  <div class="obj enter-l o4 hidden lg:block" style="top:78%;left:19%;width:108px;--rr:-3deg">
+    <div style="background:var(--lime);width:104px;height:78px;border-radius:2px;box-shadow:var(--shadow-obj);position:relative;transform:perspective(300px) rotateX(4deg)">
+      <div style="position:absolute;left:10px;top:14px;right:14px;height:2px;background:rgba(24,23,27,.5)"></div>
+      <div style="position:absolute;left:10px;top:30px;right:26px;height:2px;background:rgba(24,23,27,.35)"></div>
+      <div style="position:absolute;left:10px;top:46px;right:38px;height:2px;background:rgba(24,23,27,.35)"></div>
+      <span style="position:absolute;left:10px;bottom:8px;font-family:'JetBrains Mono';font-size:8px;font-weight:700;color:#18171B">RUSH · 48H</span>
+    </div>
+    <div class="pin pin-orange" style="top:-9px;left:44%"></div>
+  </div>
+
+  <!-- ===== DERECHA: monitor CRT + auriculares negros ===== -->
+  <svg class="obj enter-r o1 hidden lg:block" style="top:11%;right:2%;width:214px;--rr:5deg" viewBox="0 0 200 150" fill="none">
+    <defs>
+      <linearGradient id="crtBody" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#F5F3EE"/><stop offset="1" stop-color="#D8D4C8"/></linearGradient>
+      <radialGradient id="crtGlow" cx="35%" cy="30%" r="80%"><stop stop-color="#D9F500" stop-opacity=".5"/><stop offset="60%" stop-color="#5B2EFF" stop-opacity="0"/></radialGradient>
+    </defs>
+    <rect x="6" y="6" width="188" height="118" rx="16" fill="url(#crtBody)" stroke="#B9B4A6" stroke-width="2.5"/>
+    <rect x="6" y="6" width="188" height="16" rx="10" fill="#fff" opacity=".5"/>
+    <rect x="20" y="18" width="130" height="94" rx="8" fill="#0E0D10" stroke="#000" stroke-width="3"/>
+    <rect x="28" y="26" width="114" height="78" rx="4" fill="#5B2EFF" opacity=".85"/>
+    <rect x="28" y="26" width="114" height="78" rx="4" fill="url(#crtGlow)"/>
+    <rect x="40" y="40" width="56" height="6" rx="3" fill="#fff" opacity=".85"/>
+    <rect x="40" y="52" width="38" height="6" rx="3" fill="#D9F500" opacity=".9"/>
+    <rect x="40" y="64" width="46" height="6" rx="3" fill="#FF4E23" opacity=".85"/>
+    <g transform="translate(160,30)"><circle r="10" fill="#D8D4C8" stroke="#A69F8E" stroke-width="1.6" class="knob-spin"/><rect x="-1.4" y="-8" width="2.8" height="6" fill="#5B564B"/></g>
+    <g transform="translate(160,58)"><circle r="10" fill="#D8D4C8" stroke="#A69F8E" stroke-width="1.6"/><rect x="-1.4" y="-8" width="2.8" height="6" fill="#5B564B"/></g>
+    <circle cx="160" cy="88" r="6" fill="#D9F500"/>
+    <rect x="70" y="124" width="60" height="16" fill="#CAC5B7"/>
+    <rect x="50" y="140" width="100" height="8" rx="4" fill="#B9B4A6"/>
+  </svg>
+
+  <!-- auriculares circumaurales negros -->
+  <svg class="obj enter-r o2 hidden lg:block" style="top:55%;right:4%;width:156px;--rr:-4deg" viewBox="0 0 160 122" fill="none">
+    <defs><linearGradient id="cupGrad" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#2A292D"/><stop offset="1" stop-color="#0E0D10"/></linearGradient></defs>
+    <path d="M18 62a62 62 0 01124 0" stroke="#0E0D10" stroke-width="9" fill="none" stroke-linecap="round"/>
+    <path d="M22 60a58 58 0 01116 0" stroke="#3B393F" stroke-width="2" fill="none" stroke-linecap="round" opacity=".7"/>
+    <g><rect x="4" y="54" width="36" height="52" rx="16" fill="url(#cupGrad)" stroke="#000" stroke-width="2"/><ellipse cx="22" cy="80" rx="12" ry="18" fill="#46423C"/><ellipse cx="22" cy="80" rx="12" ry="18" fill="#fff" opacity=".06"/></g>
+    <g><rect x="120" y="54" width="36" height="52" rx="16" fill="url(#cupGrad)" stroke="#000" stroke-width="2"/><ellipse cx="138" cy="80" rx="12" ry="18" fill="#46423C"/><ellipse cx="138" cy="80" rx="12" ry="18" fill="#fff" opacity=".06"/></g>
+    <circle cx="22" cy="66" r="3.4" fill="#D9F500"/>
+    <path d="M140 106c9 8 9 17 2 24" stroke="#0E0D10" stroke-width="4" fill="none" stroke-linecap="round"/>
+  </svg>
+
+  <div class="obj enter-r o3 hidden lg:block" style="top:28%;right:24%;width:108px;--rr:6deg">
+    <div style="background:#fff;padding:7px 7px 18px;box-shadow:var(--shadow-obj);border-radius:2px;transform:rotate(3deg)">
+      <div style="width:94px;height:74px;background:#000;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:12px;box-sizing:border-box"><img src="images/ae_logo.png" alt="Adobe After Effects" style="width:100%;height:100%;object-fit:contain"></div>
+      <span style="display:block;text-align:center;font-family:'Archivo Black';font-size:8px;margin-top:5px;color:#18171B">HOOK 01</span>
+    </div>
+  </div>
+
+  <!-- casete -->
+  <svg class="obj enter-r o4 hidden lg:block" style="top:80%;right:15%;width:94px;--rr:-9deg" viewBox="0 0 100 64" fill="none">
+    <defs><linearGradient id="tapeBody" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#3B393F"/><stop offset="1" stop-color="#16151A"/></linearGradient></defs>
+    <rect x="2" y="2" width="96" height="60" rx="6" fill="url(#tapeBody)" stroke="#000" stroke-width="1.5"/>
+    <rect x="12" y="10" width="76" height="26" rx="3" fill="#F2EEE4"/>
+    <rect x="16" y="14" width="68" height="6" fill="#5B2EFF" opacity=".8"/>
+    <rect x="16" y="22" width="44" height="5" fill="#18171B" opacity=".7"/>
+    <circle cx="27" cy="48" r="9" fill="#D8D4C8" stroke="#000" stroke-width="1.4"/>
+    <circle cx="27" cy="48" r="9" class="reel-spin" fill="none" stroke="#18171B" stroke-width="1" stroke-dasharray="2 3"/>
+    <circle cx="73" cy="48" r="9" fill="#D8D4C8" stroke="#000" stroke-width="1.4"/>
+    <circle cx="73" cy="48" r="9" class="reel-spin" fill="none" stroke="#18171B" stroke-width="1" stroke-dasharray="2 3"/>
+    <circle cx="27" cy="48" r="3" fill="#18171B"/><circle cx="73" cy="48" r="3" fill="#18171B"/>
+  </svg>
+
+  <div class="max-w-4xl mx-auto w-full text-center relative">
+    <div class="reveal mb-7 inline-flex items-center gap-3 scissors cursor-default" style="--rr:-1.4deg">
+      <span class="dymo dymo-lime">Lima · Perú</span>
+      <span class="dymo">High-Retention Video</span>
+      <svg class="w-5 h-5 accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="6" cy="6" r="2.6" class="blade-t"/><circle cx="6" cy="18" r="2.6" class="blade-b"/>
+        <path d="M8.2 7.6L20 17" class="blade-t" stroke-linecap="round"/><path d="M8.2 16.4L20 7" class="blade-b" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <div class="relative inline-block mb-8">
+      <div class="enter-d t1 paper paper-ink inline-block px-7 py-3 mb-2 r-1" style="--rr:-1.6deg">
+        <div class="tape tape-w" style="top:-14px;left:22%;transform:rotate(-7deg)"></div>
+        <h1 class="display text-4xl sm:text-6xl md:text-7xl leading-none" data-i18n="hero_t1">EDICIÓN QUE HACE</h1>
+      </div>
+      <br>
+      <div class="enter-d t2 paper paper-lime inline-block px-7 py-3 mb-2 r-2" style="--rr:1.3deg">
+        <h1 class="display text-4xl sm:text-6xl md:text-7xl leading-none" data-i18n="hero_t2">TU CONTENIDO</h1>
+      </div>
+      <br>
+      <div class="enter-d t3 paper paper-violet inline-block px-7 py-3 r-3" style="--rr:-2.6deg">
+        <div class="pin pin-orange" style="top:-9px;right:14%"></div>
+        <h1 class="display text-4xl sm:text-6xl md:text-7xl leading-none" data-i18n="hero_t3">IMPOSIBLE DE IGNORAR</h1>
+      </div>
+    </div>
+
+    <div class="reveal d2 paper max-w-xl mx-auto px-7 py-5 mb-9 r-5" style="--rr:-.8deg">
+      <div class="tape" style="top:-13px;left:8%;transform:rotate(-6deg)"></div>
+      <div class="tape tape-v" style="bottom:-13px;right:8%;transform:rotate(4deg)"></div>
+      <p class="text-sm sm:text-base font-semibold leading-relaxed" data-i18n="hero_desc">
+        Ritmo visual, ganchos de retención y motion graphics a medida. Cada pieza sale con acabado de producción grande, no de plantilla.
+      </p>
+    </div>
+
+    <div class="reveal d3 flex flex-wrap items-center justify-center gap-4">
+      <a href="#pricing" class="mi px-8 py-4 rounded-xl text-xs font-black uppercase tracking-widest btn-fill" data-i18n="hero_btn_calc">Calcular Presupuesto</a>
+      <a href="#showcase" class="mi px-8 py-4 rounded-xl text-xs font-black uppercase tracking-widest paper"><span data-i18n="hero_btn_work">Ver Trabajos ↓</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MARQUEE ============ -->
+<div class="marquee py-5" style="background:var(--lime);box-shadow:var(--shadow-obj);transform:rotate(-1.2deg);margin:0 -2%;width:104%">
+  <div class="marquee-track display text-2xl sm:text-3xl uppercase" style="color:#18171B">
+    <span class="flex gap-10 items-center"><span>Motion Graphics</span><span>✂</span><span>Color Grading</span><span>✂</span><span>Kinetic Type</span><span>✂</span><span>3D Render</span><span>✂</span><span>Sound Design</span><span>✂</span></span>
+    <span class="flex gap-10 items-center" aria-hidden="true"><span>Motion Graphics</span><span>✂</span><span>Color Grading</span><span>✂</span><span>Kinetic Type</span><span>✂</span><span>3D Render</span><span>✂</span><span>Sound Design</span><span>✂</span></span>
+  </div>
+</div>
+
+<!-- ============ STACK ============ -->
+<section class="py-20 px-6">
+  <div class="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-7">
+    <div class="reveal ico-card mi paper p-6 text-center r-2" style="--rr:1.3deg">
+      <div class="pin" style="top:-9px;left:50%;margin-left:-10px"></div>
+      <div class="ico-box w-16 h-16 rounded-xl mx-auto flex items-center justify-center display text-xl mb-3" style="background:#18171B;color:#D9F500">Pr</div>
+      <span class="display text-sm block">Premiere Pro</span>
+      <span class="text-[11px] font-semibold opacity-60" data-i18n="stack_pr">Edición y ritmo cinético</span>
+    </div>
+    <div class="reveal d1 ico-card mi paper p-6 text-center r-1" style="--rr:-1.6deg">
+      <div class="pin pin-violet" style="top:-9px;left:50%;margin-left:-10px"></div>
+      <div class="ico-box w-16 h-16 rounded-xl mx-auto flex items-center justify-center display text-xl mb-3" style="background:#5B2EFF;color:#fff">Ae</div>
+      <span class="display text-sm block">After Effects</span>
+      <span class="text-[11px] font-semibold opacity-60" data-i18n="stack_ae">Motion graphics 2D</span>
+    </div>
+    <div class="reveal d2 ico-card mi paper p-6 text-center r-4" style="--rr:2.2deg">
+      <div class="pin pin-orange" style="top:-9px;left:50%;margin-left:-10px"></div>
+      <div class="ico-box w-16 h-16 rounded-xl mx-auto flex items-center justify-center mb-3" style="background:#FF4E23;color:#18171B">
+        <svg class="w-9 h-9 spin-slow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7.5 4.5v9L12 21l-7.5-4.5v-9L12 3z"/><path d="M12 12l7.5-4.5M12 12v9M12 12L4.5 7.5"/></svg>
+      </div>
+      <span class="display text-sm block">Blender 3D</span>
+      <span class="text-[11px] font-semibold opacity-60" data-i18n="stack_bl">Render y mockups 3D</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SHOWCASE ============ -->
+<!-- ============ HORIZONTALES 16:9 ============ -->
+<section id="h16x9" class="py-20 px-0 relative overflow-hidden hc-bg">
+  <div class="text-center mb-12 px-6 relative z-10">
+    <span class="dymo dymo-lime" data-i18n="h16_badge">Selección 16:9</span>
+    <h2 class="display text-3xl sm:text-5xl mt-4 uppercase" data-i18n="h16_title">Proyectos Horizontales</h2>
+  </div>
+
+  <div class="hc-viewport relative z-10" id="hcViewport">
+    <button onclick="hcPrev()" class="hc-arrow hc-arrow-l mi" aria-label="Anterior">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="hc-track" id="hcTrack">
+      <div class="hc-slide" onclick="hcGotoFromClick(this)">
+        <div class="paper p-3 pb-14 relative" style="--rr:0deg">
+          <div class="tape tape-v" style="top:-14px;left:50%;margin-left:-52px;transform:rotate(-8deg)"></div>
+          <div class="aspect-video relative overflow-hidden bg-black rounded-sm yt-box" style="background-image:url(https://i.ytimg.com/vi/8wjK0Og7jDs/hqdefault.jpg)">
+            <iframe class="w-full h-full yt-hc" data-src="https://www.youtube.com/embed/8wjK0Og7jDs?autoplay=1&mute=1&loop=1&playlist=8wjK0Og7jDs&controls=1&playsinline=1&modestbranding=1&rel=0" title="kickbotpro-video" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+            <span class="depth absolute top-3 left-3 dymo dymo-lime" data-i18n="badge_kickbotpro">Publicidad de marca</span>
+          </div>
+          <div class="absolute bottom-3 left-5 right-5"><h3 class="display text-lg" data-i18n="w_kbp_t">Publicidad para KickBotPro</h3></div>
+        </div>
+      </div>
+      <div class="hc-slide" onclick="hcGotoFromClick(this)">
+        <div class="paper p-3 pb-14 relative" style="--rr:0deg">
+          <div class="tape" style="top:-14px;left:50%;margin-left:-52px;transform:rotate(5deg)"></div>
+          <div class="aspect-video relative overflow-hidden bg-black rounded-sm yt-box" style="background-image:url(https://i.ytimg.com/vi/fCJ7CYCS514/hqdefault.jpg)">
+            <iframe class="w-full h-full yt-hc" data-src="https://www.youtube.com/embed/fCJ7CYCS514?autoplay=1&mute=1&loop=1&playlist=fCJ7CYCS514&controls=1&playsinline=1&modestbranding=1&rel=0" title="modelo3d-video" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+            <span class="depth absolute top-3 left-3 dymo dymo-violet">Blender 3D</span>
+          </div>
+          <div class="absolute bottom-3 left-5 right-5"><h3 class="display text-lg" data-i18n="w_m3d_t">Modelo 3D en movimiento</h3></div>
+        </div>
+      </div>
+      <div class="hc-slide" onclick="hcGotoFromClick(this)">
+        <div class="paper p-3 pb-14 relative" style="--rr:0deg">
+          <div class="tape tape-v" style="top:-14px;left:50%;margin-left:-52px;transform:rotate(-6deg)"></div>
+          <div class="aspect-video relative overflow-hidden bg-black rounded-sm yt-box" style="background-image:url(https://i.ytimg.com/vi/ZzlBtQYo_18/hqdefault.jpg)">
+            <iframe class="w-full h-full yt-hc" data-src="https://www.youtube.com/embed/ZzlBtQYo_18?autoplay=1&mute=1&loop=1&playlist=ZzlBtQYo_18&controls=1&playsinline=1&modestbranding=1&rel=0" title="documental-video" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+            <span class="depth absolute top-3 left-3 dymo dymo-lime">YouTube 16:9</span>
+          </div>
+          <div class="absolute bottom-3 left-5 right-5"><h3 class="display text-lg" data-i18n="w_doc_t">Documental & Storytelling</h3></div>
+        </div>
+      </div>
+      <div class="hc-slide" onclick="hcGotoFromClick(this)">
+        <div class="paper p-3 pb-14 relative" style="--rr:0deg">
+          <div class="tape" style="top:-14px;left:50%;margin-left:-52px;transform:rotate(7deg)"></div>
+          <div class="aspect-video relative overflow-hidden bg-black rounded-sm yt-box" style="background-image:url(https://i.ytimg.com/vi/W4Q_bigfr1E/hqdefault.jpg)">
+            <iframe class="w-full h-full yt-hc" data-src="https://www.youtube.com/embed/W4Q_bigfr1E?autoplay=1&mute=1&loop=1&playlist=W4Q_bigfr1E&controls=1&playsinline=1&modestbranding=1&rel=0" title="render3d-video" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+            <span class="depth absolute top-3 left-3 dymo dymo-violet">3D Product</span>
+          </div>
+          <div class="absolute bottom-3 left-5 right-5"><h3 class="display text-lg" data-i18n="w_r3d_t">Rendes 3D en movimiento</h3></div>
+        </div>
+      </div>
+      <div class="hc-slide" onclick="hcGotoFromClick(this)">
+        <div class="paper p-3 pb-14 relative" style="--rr:0deg">
+          <div class="tape tape-v" style="top:-14px;left:50%;margin-left:-52px;transform:rotate(-5deg)"></div>
+          <div class="aspect-video relative overflow-hidden bg-black rounded-sm yt-box" style="background-image:url(https://i.ytimg.com/vi/eMAxh1BmvH0/hqdefault.jpg)">
+            <iframe class="w-full h-full yt-hc" data-src="https://www.youtube.com/embed/eMAxh1BmvH0?autoplay=1&mute=1&loop=1&playlist=eMAxh1BmvH0&controls=1&playsinline=1&modestbranding=1&rel=0" title="introsyt-video" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+            <span class="depth absolute top-3 left-3 dymo dymo-orange">After Effects + Blender</span>
+          </div>
+          <div class="absolute bottom-3 left-5 right-5"><h3 class="display text-lg" data-i18n="w_iyt_t">Intros de YT</h3></div>
+        </div>
+      </div>
+      <div class="hc-slide" onclick="hcGotoFromClick(this)">
+        <div class="paper p-3 pb-14 relative" style="--rr:0deg">
+          <div class="tape" style="top:-14px;left:50%;margin-left:-52px;transform:rotate(4deg)"></div>
+          <div class="aspect-video relative overflow-hidden bg-black rounded-sm yt-box" style="background-image:url(https://i.ytimg.com/vi/5GroxMctBMc/hqdefault.jpg)">
+            <iframe class="w-full h-full yt-hc" data-src="https://www.youtube.com/embed/5GroxMctBMc?autoplay=1&mute=1&loop=1&playlist=5GroxMctBMc&controls=1&playsinline=1&modestbranding=1&rel=0" title="transicionesae-video" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+            <span class="depth absolute top-3 left-3 dymo dymo-lime">After Effects</span>
+          </div>
+          <div class="absolute bottom-3 left-5 right-5"><h3 class="display text-lg" data-i18n="w_tae_t">Transiciones After Effects</h3></div>
+        </div>
+      </div>
+    </div>
+    <button onclick="hcNext()" class="hc-arrow hc-arrow-r mi" aria-label="Siguiente">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+
+  <div id="hcDots" class="hc-dots relative z-10"></div>
+</section>
+
+<section id="showcase" class="py-16 px-6 max-w-6xl mx-auto scene">
+
+  <div class="text-center mb-10">
+    <span class="dymo dymo-violet" data-i18n="work_badge">Portafolio</span>
+    <h2 class="display text-3xl sm:text-5xl mt-4 uppercase" data-i18n="work_title">Proyectos Seleccionados</h2>
+  </div>
+
+  <div>
+    <div class="flex items-center justify-between mb-5">
+      <span class="dymo" data-i18n="reel_title">Piezas verticales 9:16</span>
+      <div class="flex gap-2">
+        <button onclick="scrollReels(-300)" class="mi w-10 h-10 rounded-lg paper display reel-arrow" aria-label="Anterior"><span>←</span></button>
+        <button onclick="scrollReels(300)" class="mi w-10 h-10 rounded-lg paper display reel-arrow" aria-label="Siguiente"><span>→</span></button>
+      </div>
+    </div>
+    <div id="reels" class="flex gap-6 overflow-x-auto no-bar snap-x py-4 px-1 scroll-smooth">
+      <div class="snap-item flex-shrink-0 w-60 paper p-2.5 pb-10 relative r-2" style="--rr:1.3deg"><div class="aspect-[9/16] overflow-hidden bg-black relative yt-box" style="background-image:url(https://i.ytimg.com/vi/PPgsmgSGJHU/hqdefault.jpg)"><iframe class="w-full h-full yt-lazy" data-src="https://www.youtube.com/embed/PPgsmgSGJHU?autoplay=1&mute=1&loop=1&playlist=PPgsmgSGJHU&controls=1&playsinline=1&modestbranding=1&rel=0" title="KickBotPro 0-44" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div><span class="absolute bottom-2.5 left-4 text-[10px] font-black uppercase tracking-widest opacity-60">KickBotPro 0 - 44</span></div>
+      <div class="snap-item flex-shrink-0 w-60 paper p-2.5 pb-10 relative r-1" style="--rr:-1.6deg"><div class="aspect-[9/16] overflow-hidden bg-black relative yt-box" style="background-image:url(https://i.ytimg.com/vi/loCFPnD8YiQ/hqdefault.jpg)"><iframe class="w-full h-full yt-lazy" data-src="https://www.youtube.com/embed/loCFPnD8YiQ?autoplay=1&mute=1&loop=1&playlist=loCFPnD8YiQ&controls=1&playsinline=1&modestbranding=1&rel=0" title="Cámara 3D" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div><span class="absolute bottom-2.5 left-4 text-[10px] font-black uppercase tracking-widest opacity-60" data-i18n="w_cam3d">Cámara 3D</span></div>
+      <div class="snap-item flex-shrink-0 w-60 paper p-2.5 pb-10 relative r-4" style="--rr:2.2deg"><div class="aspect-[9/16] overflow-hidden bg-black relative yt-box" style="background-image:url(https://i.ytimg.com/vi/JTngQVulmrA/hqdefault.jpg)"><iframe class="w-full h-full yt-lazy" data-src="https://www.youtube.com/embed/JTngQVulmrA?autoplay=1&mute=1&loop=1&playlist=JTngQVulmrA&controls=1&playsinline=1&modestbranding=1&rel=0" title="B-Roll" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div><span class="absolute bottom-2.5 left-4 text-[10px] font-black uppercase tracking-widest opacity-60">B-Roll</span></div>
+      <div class="snap-item flex-shrink-0 w-60 paper p-2.5 pb-10 relative r-3" style="--rr:-2.6deg"><div class="aspect-[9/16] overflow-hidden bg-black relative yt-box" style="background-image:url(https://i.ytimg.com/vi/zbtrRp2oFa0/hqdefault.jpg)"><iframe class="w-full h-full yt-lazy" data-src="https://www.youtube.com/embed/zbtrRp2oFa0?autoplay=1&mute=1&loop=1&playlist=zbtrRp2oFa0&controls=1&playsinline=1&modestbranding=1&rel=0" title="Motion CTA" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div><span class="absolute bottom-2.5 left-4 text-[10px] font-black uppercase tracking-widest opacity-60">Motion CTA</span></div><div class="snap-item flex-shrink-0 w-60 paper p-2.5 pb-10 relative r-2" style="--rr:1.8deg"><div class="aspect-[9/16] overflow-hidden bg-black relative yt-box" style="background-image:url(https://i.ytimg.com/vi/CrMbFTc8Xak/hqdefault.jpg)"><iframe class="w-full h-full yt-lazy" data-src="https://www.youtube.com/embed/CrMbFTc8Xak?autoplay=1&mute=1&loop=1&playlist=CrMbFTc8Xak&controls=1&playsinline=1&modestbranding=1&rel=0" title="Productividad / Apps" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div><span class="absolute bottom-2.5 left-4 text-[10px] font-black uppercase tracking-widest opacity-60">Productividad / Apps</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BARRA TÁCTIL ============ -->
+<section id="touchbar" class="py-20 px-6">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-10">
+      <span class="dymo dymo-lime">Interactive NLE</span>
+      <h2 class="display text-3xl sm:text-5xl mt-4 uppercase" data-i18n="nle_title">Barra Táctil de Edición</h2>
+      <p class="text-sm muted mt-2 max-w-lg mx-auto" data-i18n="nle_desc">Mueve el cabezal o toca una etapa para ver un ejemplo real de cada fase del montaje.</p>
+    </div>
+
+    <div class="reveal paper p-4 sm:p-6 relative r-5" style="--rr:-.8deg">
+      <div class="tape tape-v" style="top:-14px;left:6%;transform:rotate(-7deg)"></div>
+      <div class="tape" style="top:-14px;right:6%;transform:rotate(6deg)"></div>
+
+      <div class="grid lg:grid-cols-[1.55fr,1fr] gap-6">
+        <div>
+          <div class="relative rounded-xl overflow-hidden bg-black aspect-video" style="border:3px solid #18171B;box-shadow:var(--shadow-obj)">
+            <div id="stage-video" class="w-full h-full yt-box" style="background-image:url(https://i.ytimg.com/vi/yUvXEu0TE1g/hqdefault.jpg)"></div>
+            <div class="absolute top-3 left-3 flex items-center gap-2">
+              <span class="dymo dymo-lime" id="stage-tag">Hook</span>
+              <span class="mono text-[10px] px-2 py-1 rounded" style="background:rgba(0,0,0,.65);color:#D9F500">REC ●</span>
+            </div>
+            <div class="absolute top-3 right-3 flex items-center gap-1.5 group">
+              <div class="w-0 opacity-0 group-hover:w-20 group-hover:opacity-100 overflow-hidden transition-all duration-300 flex items-center px-1 rounded-full" style="background:rgba(0,0,0,.55)">
+                <input type="range" min="0" max="100" value="80" id="nle-vol-slider" oninput="nleSetVolume(this.value)" class="w-20" style="accent-color:#D9F500" aria-label="Volumen">
+              </div>
+              <button onclick="nleToggleMute()" id="nle-mute-btn" class="depth w-9 h-9 rounded-full btn-fill flex items-center justify-center mi flex-shrink-0" aria-label="Activar sonido">
+                <svg id="nle-mute-ico" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+              </button>
+            </div>
+            <button onclick="nleTogglePlay()" id="nle-playbtn" class="depth absolute bottom-3 left-3 w-9 h-9 rounded-full btn-fill flex items-center justify-center mi" aria-label="Reproducir / Pausar">
+              <svg id="nle-play-ico" class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <div class="absolute bottom-3 right-3 mono text-xs px-2.5 py-1 rounded" style="background:rgba(0,0,0,.7);color:#D9F500" id="timecode">00:00:00:00</div>
+          </div>
+
+          <div class="mt-5">
+            <div class="h-10 w-full rounded-lg flex overflow-hidden text-[10px] font-black uppercase tracking-wider" style="border:2px solid #18171B">
+              <button id="nbtn-hook" onclick="nleJump('hook')" class="w-1/4 flex items-center justify-center transition-all nle-btn" style="background:#D9F500;color:#18171B">Hook 0-3s</button>
+              <button id="nbtn-broll" onclick="nleJump('broll')" class="w-2/4 flex items-center justify-center transition-all nle-btn" style="background:#5B2EFF;color:#fff">B-Roll & Ritmo</button>
+              <button id="nbtn-cta" onclick="nleJump('cta')" class="w-1/4 flex items-center justify-center transition-all nle-btn" style="background:#FF4E23;color:#18171B;border-left:2px solid #18171B">Motion CTA</button>
+            </div>
+            <div id="nle-track" class="nle-track mt-3" onclick="nleTrackClick(event)">
+              <div class="nle-seg" style="left:0%;width:5.769%;background:#D9F500"></div>
+              <div class="nle-seg" style="left:5.769%;width:78.846%;background:#5B2EFF"></div>
+              <div class="nle-seg" style="left:84.615%;width:15.385%;background:#FF4E23"></div>
+              <div id="nle-thumb" class="nle-thumb"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-3">
+          <div id="chip-hook" class="stage-chip mi cursor-pointer p-4 rounded-xl" onclick="nleJump('hook')" style="border:2px solid #18171B;background:#D9F500;color:#18171B">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0" style="background:#18171B;color:#D9F500"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg></div>
+              <div><span class="display text-sm block">Hook</span><span class="text-[11px] font-semibold opacity-70">Los 3 segundos que deciden todo</span></div>
+            </div>
+          </div>
+          <div id="chip-broll" class="stage-chip mi cursor-pointer p-4 rounded-xl chip-idle" onclick="nleJump('broll')">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0" style="background:#5B2EFF;color:#fff"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18M8 4v16"/></svg></div>
+              <div><span class="display text-sm block">B-Roll & Ritmo</span><span class="text-[11px] font-semibold opacity-70">Cortes al beat y capas de apoyo</span></div>
+            </div>
+          </div>
+          <div id="chip-cta" class="stage-chip mi cursor-pointer p-4 rounded-xl chip-idle" onclick="nleJump('cta')">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0" style="background:#FF4E23;color:#18171B"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3l7.5 4.5v9L12 21l-7.5-4.5v-9L12 3z"/><path d="M12 12l7.5-4.5M12 12v9"/></svg></div>
+              <div><span class="display text-sm block">Motion CTA</span><span class="text-[11px] font-semibold opacity-70">Cierre animado que convierte</span></div>
+            </div>
+          </div>
+
+          <div class="mt-auto grid grid-cols-2 gap-3 pt-3">
+            <div class="p-3 rounded-lg text-center" style="background:rgba(24,23,27,.06);border:1px solid rgba(24,23,27,.22)">
+              <span class="text-[10px] uppercase tracking-widest block" style="color:rgba(24,23,27,.6)">Diseño sonoro</span>
+              <div class="flex justify-center items-end gap-1 h-6 mt-1.5"><span class="eq w-1.5 rounded-sm" style="background:#5B2EFF"></span><span class="eq w-1.5 rounded-sm" style="background:#FF4E23"></span><span class="eq w-1.5 rounded-sm" style="background:#18171B"></span><span class="eq w-1.5 rounded-sm" style="background:#5B2EFF"></span></div>
+            </div>
+            <div class="p-3 rounded-lg text-center" style="background:rgba(24,23,27,.06);border:1px solid rgba(24,23,27,.22)"><span class="text-[10px] uppercase tracking-widest block" style="color:rgba(24,23,27,.6)">Master</span><strong class="display text-xs block mt-2" style="color:#18171B">ProRes 4K 60</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ CLIENTES ============ -->
+<section id="clients" class="py-20 px-6 max-w-6xl mx-auto">
+  <div class="text-center mb-12">
+    <span class="dymo dymo-orange" data-i18n="clients_badge">Confían en MENSVA</span>
+    <h2 class="display text-3xl sm:text-5xl mt-4 uppercase" data-i18n="clients_title">Clientes Anteriores</h2>
+    <p class="text-sm muted mt-2 max-w-lg mx-auto" data-i18n="clients_desc">Creadores y canales con los que ya trabajé.</p>
+  </div>
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
+    <a href="https://www.youtube.com/@MateoZFN" target="_blank" rel="noopener noreferrer" class="client-card reveal paper p-5 pb-6 relative text-center block" style="--rr:-3.2deg">
+      <div class="tape" style="top:-13px;left:50%;margin-left:-52px;transform:rotate(-3.2deg)"></div>
+      <div class="w-20 h-20 mx-auto rounded-full overflow-hidden" style="border:3px solid #18171B;box-shadow:var(--shadow-obj)">
+        <img src="images/mateozfn.jpg" class="w-full h-full object-cover" alt="MateoZFN">
+      </div>
+      <h3 class="display text-sm mt-3">MateoZFN</h3>
+      <span class="dymo dymo-lime mt-2 inline-block">Ver canal →</span>
+    </a>
+    <a href="https://www.youtube.com/@mateozcs2/videos" target="_blank" rel="noopener noreferrer" class="client-card reveal paper p-5 pb-6 relative text-center block" style="--rr:2.4deg">
+      <div class="tape tape-v" style="top:-13px;left:50%;margin-left:-52px;transform:rotate(2.4deg)"></div>
+      <div class="w-20 h-20 mx-auto rounded-full overflow-hidden" style="border:3px solid #18171B;box-shadow:var(--shadow-obj)">
+        <img src="images/mateozcs2.jpg" class="w-full h-full object-cover" alt="MateoZ CS2">
+      </div>
+      <h3 class="display text-sm mt-3">MateoZ CS2</h3>
+      <span class="dymo dymo-lime mt-2 inline-block">Ver canal →</span>
+    </a>
+    <a href="https://www.youtube.com/@Megazote" target="_blank" rel="noopener noreferrer" class="client-card reveal paper p-5 pb-6 relative text-center block" style="--rr:-1.6deg">
+      <div class="tape" style="top:-13px;left:50%;margin-left:-52px;transform:rotate(-1.6deg)"></div>
+      <div class="w-20 h-20 mx-auto rounded-full overflow-hidden" style="border:3px solid #18171B;box-shadow:var(--shadow-obj)">
+        <img src="images/megazote.jpg" class="w-full h-full object-cover" alt="Megazote">
+      </div>
+      <h3 class="display text-sm mt-3">Megazote</h3>
+      <span class="dymo dymo-lime mt-2 inline-block">Ver canal →</span>
+    </a>
+    <a href="https://www.youtube.com/@soarinngchu" target="_blank" rel="noopener noreferrer" class="client-card reveal paper p-5 pb-6 relative text-center block" style="--rr:3deg">
+      <div class="tape tape-v" style="top:-13px;left:50%;margin-left:-52px;transform:rotate(3deg)"></div>
+      <div class="w-20 h-20 mx-auto rounded-full overflow-hidden" style="border:3px solid #18171B;box-shadow:var(--shadow-obj)">
+        <img src="images/soarinngchu.jpg" class="w-full h-full object-cover" alt="soarinngchu">
+      </div>
+      <h3 class="display text-sm mt-3">soarinngchu</h3>
+      <span class="dymo dymo-lime mt-2 inline-block">Ver canal →</span>
+    </a>
+    <a href="https://www.youtube.com/@elronis" target="_blank" rel="noopener noreferrer" class="client-card reveal paper p-5 pb-6 relative text-center block" style="--rr:-2.2deg">
+      <div class="tape" style="top:-13px;left:50%;margin-left:-52px;transform:rotate(-2.2deg)"></div>
+      <div class="w-20 h-20 mx-auto rounded-full overflow-hidden" style="border:3px solid #18171B;box-shadow:var(--shadow-obj)">
+        <img src="images/elronis.jpg" class="w-full h-full object-cover" alt="elronis">
+      </div>
+      <h3 class="display text-sm mt-3">elronis</h3>
+      <span class="dymo dymo-lime mt-2 inline-block">Ver canal →</span>
+    </a>
+    <a href="https://www.youtube.com/@ElStrikew" target="_blank" rel="noopener noreferrer" class="client-card reveal paper p-5 pb-6 relative text-center block" style="--rr:2.8deg">
+      <div class="tape tape-v" style="top:-13px;left:50%;margin-left:-52px;transform:rotate(2.8deg)"></div>
+      <div class="w-20 h-20 mx-auto rounded-full overflow-hidden" style="border:3px solid #18171B;box-shadow:var(--shadow-obj)">
+        <img src="images/elstrikew.jpg" class="w-full h-full object-cover" alt="ElStrikew">
+      </div>
+      <h3 class="display text-sm mt-3">ElStrikew</h3>
+      <span class="dymo dymo-lime mt-2 inline-block">Ver canal →</span>
+    </a>
+  </div>
+</section>
+
+<!-- ============ COTIZADOR ============ -->
+<section id="pricing" class="py-20 px-6 max-w-4xl mx-auto">
+  <div class="reveal mb-10 text-center">
+    <span class="dymo">01 / Cotizador</span>
+    <h2 class="display text-3xl sm:text-5xl mt-4 uppercase" data-i18n="price_title">Calcula tu Inversión</h2>
+    <p class="text-sm muted mt-2" data-i18n="price_desc">Precios fijos por minuto o por pieza, sin letra chica.</p>
+  </div>
+
+  <div class="reveal grid grid-cols-3 gap-3 mb-8">
+    <button id="tab-horizontal" onclick="switchFormat('horizontal')" class="mi py-3.5 rounded-xl text-[11px] font-black uppercase tracking-widest btn-fill"><span>Horizontal</span></button>
+    <button id="tab-vertical" onclick="switchFormat('vertical')" class="mi py-3.5 rounded-xl text-[11px] font-black uppercase tracking-widest paper"><span>Vertical</span></button>
+    <button id="tab-motion" onclick="switchFormat('motion')" class="mi py-3.5 rounded-xl text-[11px] font-black uppercase tracking-widest paper"><span>Motion 3D</span></button>
+  </div>
+
+  <div id="panel-standard">
+    <div class="reveal grid grid-cols-1 md:grid-cols-3 gap-6 mb-7 scene">
+      <div onclick="selectTier('basic')" id="card-basic" class="cursor-pointer paper p-5 tilt relative r-1" data-tilt style="--rr:-1.6deg">
+        <div class="tape" id="mark-basic" style="top:-13px;left:20%;transform:rotate(-6deg)"></div>
+        <span class="text-[10px] font-black uppercase tracking-widest opacity-50 block mb-1">Cortes limpios</span>
+        <h4 class="display text-xl uppercase mb-2">Básica</h4>
+        <div class="display text-4xl mb-3">$<span id="p-basic">10</span><span class="text-xs font-semibold opacity-50 ml-1" id="u-basic">/ min</span></div>
+        <ul class="text-[11px] font-semibold opacity-70 space-y-1"><li>— Recortes y saltos de ritmo</li><li>— Zooms funcionales</li><li>— Subtítulos básicos</li></ul>
+      </div>
+      <div onclick="selectTier('intermediate')" id="card-intermediate" class="cursor-pointer paper p-5 tilt relative r-2" data-tilt style="--rr:1.3deg">
+        <div class="tape hidden" id="mark-intermediate" style="top:-13px;left:20%;transform:rotate(-6deg)"></div>
+        <span class="text-[10px] font-black uppercase tracking-widest opacity-50 block mb-1">Ritmo y retención</span>
+        <h4 class="display text-xl uppercase mb-2">Intermedia</h4>
+        <div class="display text-4xl mb-3">$<span id="p-intermediate">15</span><span class="text-xs font-semibold opacity-50 ml-1" id="u-intermediate">/ min</span></div>
+        <ul class="text-[11px] font-semibold opacity-70 space-y-1"><li>— Todo lo básico incluido</li><li>— Efectos visuales dinámicos</li><li>— Diseño de sonido pulido</li></ul>
+      </div>
+      <div onclick="selectTier('advanced')" id="card-advanced" class="cursor-pointer paper p-5 tilt relative r-3" data-tilt style="--rr:-2.6deg">
+        <div class="tape hidden" id="mark-advanced" style="top:-13px;left:20%;transform:rotate(-6deg)"></div>
+        <span class="text-[10px] font-black uppercase tracking-widest opacity-50 block mb-1">Acabado premium</span>
+        <h4 class="display text-xl uppercase mb-2">Avanzada</h4>
+        <div class="display text-4xl mb-3">$<span id="p-advanced">25</span><span class="text-xs font-semibold opacity-50 ml-1" id="u-advanced">/ min</span></div>
+        <ul class="text-[11px] font-semibold opacity-70 space-y-1"><li>— Motion graphics 2D/3D</li><li>— Rotoscopia y color grade</li><li>— Recursos a medida</li></ul>
+      </div>
+    </div>
+
+    <div class="reveal paper p-6 mb-6 space-y-5 r-5" style="--rr:-.8deg">
+      <div>
+        <div class="flex justify-between items-center text-[11px] font-black uppercase tracking-widest mb-2">
+          <span id="slider-title">Duración del video</span>
+          <span id="slider-count" class="px-2 py-1 rounded" style="background:var(--lime);color:#18171B">5 minutos</span>
+        </div>
+        <div class="slider-shell">
+          <div class="slider-track"><div class="slider-fill" id="qty-fill"></div></div>
+          <div class="slider-thumb" id="qty-thumb"></div>
+          <input type="range" min="1" max="30" value="5" id="qty" class="slider-input" oninput="calcTotal()" aria-label="Duración"></div>
+      </div>
+      <div class="flex items-center justify-between pt-4" style="border-top:2px dashed rgba(24,23,27,.18)">
+        <div><span class="text-xs font-black uppercase tracking-wide block">Entrega prioritaria</span><span class="text-[11px] font-semibold opacity-60">Menos de 24-48h (+30%)</span></div>
+        <input type="checkbox" id="rush" class="w-5 h-5 cursor-pointer" style="accent-color:#5B2EFF" onchange="calcTotal()">
+      </div>
+    </div>
+
+    <div class="reveal paper paper-violet p-7 flex flex-col sm:flex-row items-center justify-between gap-5 r-4" style="--rr:2.2deg">
+      <div>
+        <span class="dymo dymo-lime">Presupuesto estimado</span>
+        <div class="display text-5xl sm:text-6xl mt-3" style="color:#D9F500">$<span id="total">50</span><span class="text-base ml-2" style="color:#F2EEE4">USD</span></div>
+        <span class="text-[11px] font-semibold opacity-70 mt-1 block">Incluye 1 ronda de ajustes y masterización final.</span>
+      </div>
+      <a id="wa-pricing" href="#" class="mi w-full sm:w-auto px-8 py-4 rounded-xl font-black text-[11px] uppercase tracking-widest text-center" style="background:#D9F500;color:#18171B" data-i18n="price_cta">Consultar disponibilidad →</a>
+    </div>
+  </div>
+
+  <div id="panel-motion" class="hidden paper p-9 text-center r-1" style="--rr:-1.6deg">
+    <div class="w-16 h-16 rounded-xl mx-auto flex items-center justify-center mb-4" style="background:#5B2EFF;color:#fff"><svg class="w-8 h-8 spin-slow" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 3l7.5 4.5v9L12 21l-7.5-4.5v-9L12 3z"/><path d="M12 12l7.5-4.5M12 12v9M12 12L4.5 7.5"/></svg></div>
+    <h3 class="display text-2xl uppercase mb-2">Motion Graphics 3D</h3>
+    <p class="text-xs font-semibold opacity-60 max-w-md mx-auto mb-6">Cada animación de producto, comercial 3D o SaaS explainer requiere analizar modelado, físicas y guion. Se cotiza a medida.</p>
+    <a href="https://wa.me/?text=Hola%20MENSVA%2C%20quisiera%20cotizar%20un%20proyecto%20de%20Motion%20Graphics%203D" target="_blank" rel="noopener" class="mi px-8 py-4 rounded-xl btn-fill font-black text-[11px] uppercase tracking-widest inline-block">Cotizar a medida →</a>
+  </div>
+</section>
+
+<!-- ============ CONTACTO ============ -->
+<section id="contact" class="py-20 px-6 max-w-4xl mx-auto">
+  <div class="grid md:grid-cols-[auto,1fr] gap-10 items-center mb-12">
+    <div class="reveal mascot mx-auto w-28 h-28 rounded-2xl flex items-center justify-center" style="background:var(--lime);box-shadow:var(--shadow-obj)">
+      <svg viewBox="0 0 64 64" class="w-20 h-20" fill="none" stroke="#18171B" stroke-width="3" stroke-linecap="round">
+        <rect x="12" y="16" width="40" height="32" rx="9" fill="#18171B"/>
+        <circle class="eye" cx="25" cy="31" r="4" fill="#D9F500"/>
+        <circle class="eye" cx="39" cy="31" r="4" fill="#D9F500"/>
+        <path d="M26 40q6 5 12 0" stroke="#D9F500"/>
+        <path class="mascot-arm" d="M52 30l7-8"/><path d="M32 16V9"/>
+        <circle cx="32" cy="7" r="3" fill="#FF4E23" stroke="none"/>
+      </svg>
+    </div>
+    <div class="reveal d1 paper p-6 r-2" style="--rr:1.3deg">
+      <div class="tape tape-v" style="top:-13px;left:10%;transform:rotate(-7deg)"></div>
+      <span class="dymo dymo-violet" data-i18n="contact_badge">Contacto directo</span>
+      <h2 class="display text-2xl sm:text-3xl uppercase mt-3" data-i18n="contact_title">Conectemos de Inmediato</h2>
+      <p class="text-xs font-semibold opacity-60 mt-2" data-i18n="contact_desc">Cuéntame el formato, la duración y la fecha objetivo. Respondo con propuesta y tiempos el mismo día.</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-5">
+    <button onclick="copyMail()" class="mi ico-card paper p-4 text-center r-1" style="--rr:-1.6deg">
+      <div class="ico-box w-11 h-11 rounded-lg mx-auto flex items-center justify-center mb-2 display text-sm" style="background:#5B2EFF;color:#fff">@</div>
+      <span class="display text-xs block">Gmail</span><span class="text-[10px] font-semibold opacity-60" id="mail-status">Copiar correo</span>
+    </button>
+    <a href="https://twitter.com" target="_blank" rel="noopener" class="mi ico-card paper p-4 text-center block r-2" style="--rr:1.3deg">
+      <div class="ico-box w-11 h-11 rounded-lg mx-auto flex items-center justify-center mb-2 display text-sm" style="background:#18171B;color:#fff">𝕏</div>
+      <span class="display text-xs block">X</span><span class="text-[10px] font-semibold opacity-60">Mensaje directo</span>
+    </a>
+    <a href="https://instagram.com" target="_blank" rel="noopener" class="mi ico-card paper p-4 text-center block r-4" style="--rr:2.2deg">
+      <div class="ico-box w-11 h-11 rounded-lg mx-auto flex items-center justify-center mb-2 display text-sm" style="background:#FF4E23;color:#18171B">IG</div>
+      <span class="display text-xs block">Instagram</span><span class="text-[10px] font-semibold opacity-60">@mensva.editor</span>
+    </a>
+    <a href="https://wa.me/" target="_blank" rel="noopener" class="mi ico-card paper p-4 text-center block r-3" style="--rr:-2.6deg">
+      <div class="ico-box w-11 h-11 rounded-lg mx-auto flex items-center justify-center mb-2 display text-sm" style="background:#D9F500;color:#18171B">WA</div>
+      <span class="display text-xs block">WhatsApp</span><span class="text-[10px] font-semibold opacity-60">Chat directo</span>
+    </a>
+  </div>
+</section>
+
+<footer class="py-10 px-6 text-center"><span class="dymo">© 2026 Mensva Editor</span></footer>
+
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" class="fixed inset-0 z-[60] hidden items-center justify-center p-4" style="background:rgba(0,0,0,.9);backdrop-filter:blur(10px)">
+  <div id="lightbox-box" class="relative w-full max-w-3xl aspect-video overflow-hidden rounded-xl" style="background:#000;border:3px solid #F2EEE4">
+    <button onclick="closeVideo()" class="mi absolute top-3 right-3 z-10 px-3 py-1.5 rounded-lg display text-xs btn-fill">✕</button>
+    <iframe id="lightbox-frame" class="w-full h-full" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+  </div>
+</div>
+
+<script>
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');obs.unobserve(e.target)}})},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+/* Reproducir cada video del portafolio solo mientras está visible: evita que
+   los 7 clips decodifiquen a la vez al cargar (causa principal del lag al
+   deslizar) sin sacrificar calidad ni cuadros por segundo del video en sí. */
+const vidObs=new IntersectionObserver(es=>{es.forEach(e=>{
+  if(e.isIntersecting) e.target.play().catch(()=>{});
+  else e.target.pause();
+})},{threshold:.2});
+document.querySelectorAll('video[autoplay]').forEach(v=>{v.removeAttribute('autoplay');vidObs.observe(v)});
+
+/* ===== Carrusel Horizontal 16:9 (loop infinito, estilo centeredSlides) ===== */
+const hcTrack=document.getElementById('hcTrack');
+const hcViewport=document.getElementById('hcViewport');
+const hcRealSlides=hcTrack?[...hcTrack.querySelectorAll('.hc-slide')]:[];
+const hcDotsEl=document.getElementById('hcDots');
+const hcRealCount=hcRealSlides.length;
+let hcSlides=hcRealSlides,hcIndex=0,hcLooping=false;
+
+if(hcTrack && hcRealCount>1){
+  hcLooping=true;
+  const firstClone=hcRealSlides[0].cloneNode(true);
+  const lastClone=hcRealSlides[hcRealCount-1].cloneNode(true);
+  [firstClone,lastClone].forEach(c=>{
+    c.classList.add('hc-clone');
+    const v=c.querySelector('video');if(v){v.removeAttribute('id');v.muted=true;v.pause()}
+    const muteBtn=c.querySelector('button[aria-label="Activar sonido"],button[aria-label="Silenciar"]');if(muteBtn)muteBtn.remove();
+    const playBtn=c.querySelector('.hc-play');if(playBtn)playBtn.remove();
+  });
+  hcTrack.insertBefore(lastClone,hcTrack.firstChild);
+  hcTrack.appendChild(firstClone);
+  hcSlides=[...hcTrack.querySelectorAll('.hc-slide')];
+  hcIndex=1;
+}
+
+hcRealSlides.forEach((s,i)=>{
+  const dot=document.createElement('button');
+  dot.className='hc-dot'+(i===0?' active':'');
+  dot.setAttribute('aria-label','Ir al proyecto '+(i+1));
+  dot.onclick=()=>hcGoto(i+(hcLooping?1:0));
+  hcDotsEl.appendChild(dot);
+});
+
+let hcVisible=false;
+function hcLoadFrame(s,on){
+  const f=s.querySelector('iframe.yt-hc');if(!f)return;
+  if(on&&hcVisible){if(f.dataset.on!=='1'){f.src=f.dataset.src;f.dataset.on='1'}}
+  else if(f.dataset.on==='1'){f.src='about:blank';f.dataset.on='0'}
+}
+if(hcViewport&&'IntersectionObserver' in window){new IntersectionObserver(es=>{hcVisible=es[0].isIntersecting;hcSlides.forEach((s,i)=>hcLoadFrame(s,i===hcIndex))},{threshold:.25}).observe(hcViewport)}
+function hcRealIndex(i){return hcLooping?(i-1+hcRealCount)%hcRealCount:i}
+
+function hcUpdate(animate=true){
+  const active=hcSlides[hcIndex];
+  if(!active)return;
+  if(!animate)hcTrack.style.transition='none';
+  const offset=active.offsetLeft-(hcViewport.offsetWidth-active.offsetWidth)/2;
+  hcTrack.style.transform='translateX('+(-offset)+'px)';
+  if(!animate){void hcTrack.offsetWidth;hcTrack.style.transition=''}
+  hcSlides.forEach((s,i)=>{
+    s.classList.toggle('hc-active',i===hcIndex);
+    s.classList.remove('hc-paused');
+    hcLoadFrame(s,i===hcIndex);
+    const v=s.querySelector('video');
+    if(!v)return;
+    if(i===hcIndex){v.play().then(()=>{}).catch(()=>{s.classList.add('hc-paused')})}
+    else{v.pause()}
+  });
+  const ri=hcRealIndex(hcIndex);
+  [...hcDotsEl.children].forEach((d,i)=>d.classList.toggle('active',i===ri));
+}
+function hcGoto(i){hcIndex=i;hcUpdate()}
+function hcNext(){hcGoto(hcIndex+1)}
+function hcPrev(){hcGoto(hcIndex-1)}
+function hcGotoFromClick(el){const i=hcSlides.indexOf(el);if(i!==hcIndex)hcGoto(i)}
+function hcPlayToggle(id,btn){const v=document.getElementById(id);if(!v)return;v.play();btn.closest('.hc-slide').classList.remove('hc-paused')}
+if(hcTrack){
+  hcTrack.addEventListener('transitionend',e=>{
+    if(e.target!==hcTrack||e.propertyName!=='transform'||!hcLooping)return;
+    if(hcIndex===0){hcIndex=hcRealCount;hcUpdate(false)}
+    else if(hcIndex===hcSlides.length-1){hcIndex=1;hcUpdate(false)}
+  });
+  let hcStartX=0,hcDeltaX=0,hcDragging=false;
+  hcTrack.addEventListener('touchstart',e=>{hcStartX=e.touches[0].clientX;hcDragging=true},{passive:true});
+  hcTrack.addEventListener('touchmove',e=>{if(!hcDragging)return;hcDeltaX=e.touches[0].clientX-hcStartX},{passive:true});
+  hcTrack.addEventListener('touchend',()=>{if(!hcDragging)return;hcDragging=false;if(hcDeltaX<-50)hcNext();else if(hcDeltaX>50)hcPrev();hcDeltaX=0});
+  addEventListener('resize',()=>hcUpdate(false));
+  hcUpdate(false);
+}
+
+
+
+
+function scrollReels(o){document.getElementById('reels').scrollBy({left:o,behavior:'smooth'})}
+
+function toggleMute(id,btn){
+  const v=document.getElementById(id);
+  v.muted=!v.muted;
+  const onIco=btn.querySelector('.ico-mute-on');
+  if(v.muted){onIco.innerHTML='<path d="M11 5L6 9H3v6h3l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>';btn.setAttribute('aria-label','Activar sonido')}
+  else{onIco.innerHTML='<path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18 6a9 9 0 010 12"/>';btn.setAttribute('aria-label','Silenciar')}
+}
+
+function syncSlider(id){
+  const inp=document.getElementById(id);
+  const fill=document.getElementById(id+'-fill'),thumb=document.getElementById(id+'-thumb');
+  if(!inp||!fill||!thumb)return;
+  const pct=(inp.value-inp.min)/(inp.max-inp.min)*100;
+  fill.style.width=pct+'%';thumb.style.left=pct+'%';
+}
+
+/* ===== Barra táctil NLE: sincronización real con el video (clic/drag + timeupdate) ===== */
+const NLE_SEGMENTS={hook:{start:0,end:4},broll:{start:4,end:45},cta:{start:45,end:52}};
+const nleVideo=(function(){
+  let p=null,ready=false,pend=null,pendPlay=false,vol=80,muted=true,loaded=false,lastSeek=null;
+  const lis={timeupdate:[],loadedmetadata:[],ended:[]};
+  const emit=n=>lis[n].forEach(f=>f());
+  function load(){
+    if(loaded)return;loaded=true;
+    const init=()=>{p=new YT.Player('stage-video',{width:'100%',height:'100%',videoId:'yUvXEu0TE1g',playerVars:{controls:0,disablekb:1,modestbranding:1,rel:0,playsinline:1,iv_load_policy:3,fs:0},events:{
+      onReady:()=>{ready=true;p.mute();p.setVolume(vol);if(pend!==null){p.seekTo(pend,true);pend=null}if(pendPlay){p.playVideo();pendPlay=false}emit('loadedmetadata');setInterval(()=>emit('timeupdate'),250)},
+      onStateChange:e=>{const ico=document.getElementById('nle-play-ico');if(e.data===1)ico.innerHTML='<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>';else if(e.data===2||e.data===0){ico.innerHTML='<path d="M8 5v14l11-7z"/>';if(e.data===0)emit('ended')}}}})};
+    if(window.YT&&YT.Player)init();else{window.onYouTubeIframeAPIReady=init;const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';document.head.appendChild(s)}
+  }
+  const sec=document.getElementById('touchbar');
+  if(sec&&'IntersectionObserver' in window){const o=new IntersectionObserver(es=>{if(es[0].isIntersecting){load();o.disconnect()}},{rootMargin:'300px'});o.observe(sec)}else load();
+  return{
+    get currentTime(){if(lastSeek&&Date.now()-lastSeek.ts<600)return lastSeek.t;return ready?p.getCurrentTime():(pend||0)},
+    set currentTime(t){lastSeek={t,ts:Date.now()};if(ready)p.seekTo(t,true);else{pend=t;load()}},
+    get duration(){return ready?(p.getDuration()||52):52},
+    get paused(){return !(ready&&p.getPlayerState()===1)},
+    get muted(){return ready?p.isMuted():muted},
+    set muted(v){muted=v;if(ready){v?p.mute():p.unMute()}},
+    get volume(){return ready?p.getVolume()/100:vol/100},
+    set volume(v){vol=Math.round(v*100);if(ready)p.setVolume(vol)},
+    play(){if(ready)p.playVideo();else{pendPlay=true;load()}return Promise.resolve()},
+    pause(){if(ready)p.pauseVideo()},
+    addEventListener(n,f){if(lis[n])lis[n].push(f)}
+  }
+})();
+const nleTrack=document.getElementById('nle-track');
+const nleThumb=document.getElementById('nle-thumb');
+let nleStage='hook',nleDragging=false;
+
+function nleSegFromTime(t){if(t<NLE_SEGMENTS.hook.end)return'hook';if(t<NLE_SEGMENTS.broll.end)return'broll';return'cta'}
+
+function nleSetActive(k){
+  nleStage=k;
+  ['hook','broll','cta'].forEach(s=>{
+    const chip=document.getElementById('chip-'+s),btn=document.getElementById('nbtn-'+s);
+    if(s===k){
+      const bg=s==='hook'?'#D9F500':s==='broll'?'#5B2EFF':'#FF4E23';const fg=s==='broll'?'#fff':'#18171B';
+      chip.classList.remove('chip-idle');chip.style.background=bg;chip.style.color=fg;chip.style.borderColor='#18171B';
+      btn.classList.add('nle-btn-active');
+    }else{
+      chip.classList.add('chip-idle');chip.style.background='';chip.style.color='';chip.style.borderColor='';
+      btn.classList.remove('nle-btn-active');
+    }
+  });
+  document.getElementById('stage-tag').textContent=k==='hook'?'Hook':k==='broll'?'B-Roll & Ritmo':'Motion CTA';
+}
+
+function nleFmtTC(t){
+  t=Math.max(0,t);const s=Math.floor(t),f=Math.floor((t-s)*24);
+  const mm=String(Math.floor(s/60)).padStart(2,'0'),ss=String(s%60).padStart(2,'0');
+  return `00:${mm}:${ss}:${String(f).padStart(2,'0')}`;
+}
+
+function nleUpdateThumb(){
+  const dur=nleVideo.duration||52;
+  const pct=Math.max(0,Math.min(100,(nleVideo.currentTime/dur)*100));
+  nleThumb.style.left=pct+'%';
+  document.getElementById('timecode').textContent=nleFmtTC(nleVideo.currentTime);
+}
+
+function nleJump(k){
+  const seg=NLE_SEGMENTS[k];
+  nleVideo.currentTime=seg.start;
+  nleVideo.play().catch(()=>{});
+  nleSetActive(k);
+  nleUpdateThumb();
+}
+
+function nleSeekAtClientX(clientX){
+  const r=nleTrack.getBoundingClientRect();
+  let frac=(clientX-r.left)/r.width;frac=Math.max(0,Math.min(1,frac));
+  const dur=nleVideo.duration||52;
+  nleVideo.currentTime=frac*dur;
+  nleUpdateThumb();
+  const k=nleSegFromTime(nleVideo.currentTime);
+  if(k!==nleStage)nleSetActive(k);
+}
+
+function nleTrackClick(e){if(nleDragging)return;nleSeekAtClientX(e.clientX)}
+
+function nleTogglePlay(){
+  const ico=document.getElementById('nle-play-ico');
+  if(nleVideo.paused){nleVideo.play().catch(()=>{});ico.innerHTML='<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>'}
+  else{nleVideo.pause();ico.innerHTML='<path d="M8 5v14l11-7z"/>'}
+}
+
+nleVideo.addEventListener('timeupdate',()=>{
+  if(nleDragging)return;
+  nleUpdateThumb();
+  const k=nleSegFromTime(nleVideo.currentTime);
+  if(k!==nleStage)nleSetActive(k);
+});
+nleVideo.addEventListener('loadedmetadata',nleUpdateThumb);
+nleVideo.addEventListener('ended',()=>{document.getElementById('nle-play-ico').innerHTML='<path d="M8 5v14l11-7z"/>'});
+
+function nleUpdateMuteIcon(){
+  const ico=document.getElementById('nle-mute-ico'),btn=document.getElementById('nle-mute-btn');
+  if(nleVideo.muted||nleVideo.volume===0){
+    ico.innerHTML='<path d="M11 5L6 9H3v6h3l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>';
+    btn.setAttribute('aria-label','Activar sonido');
+  }else{
+    ico.innerHTML='<path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18 6a9 9 0 010 12"/>';
+    btn.setAttribute('aria-label','Silenciar');
+  }
+}
+function nleToggleMute(){
+  nleVideo.muted=!nleVideo.muted;
+  if(!nleVideo.muted && nleVideo.volume===0){nleVideo.volume=.8;document.getElementById('nle-vol-slider').value=80}
+  nleUpdateMuteIcon();
+}
+function nleSetVolume(v){
+  nleVideo.volume=v/100;
+  nleVideo.muted=(v==0);
+  nleUpdateMuteIcon();
+}
+nleUpdateMuteIcon();
+
+nleThumb.addEventListener('pointerdown',e=>{nleDragging=true;nleThumb.setPointerCapture(e.pointerId);e.stopPropagation()});
+nleThumb.addEventListener('pointermove',e=>{if(!nleDragging)return;nleSeekAtClientX(e.clientX)});
+['pointerup','pointercancel'].forEach(evt=>nleThumb.addEventListener(evt,()=>{if(!nleDragging)return;nleDragging=false;nleVideo.play().catch(()=>{})}));
+
+function updateSplit(v){document.getElementById('raw-overlay').style.clipPath=`inset(0 ${100-v}% 0 0)`;document.getElementById('split-handle').style.left=v+'%'}
+
+let fmt='horizontal',tier='basic';
+const rates={horizontal:{basic:10,intermediate:15,advanced:25,unit:'/ min'},vertical:{basic:17,intermediate:25,advanced:60,unit:'/ video'}};
+function switchFormat(f){
+  fmt=f;
+  ['horizontal','vertical','motion'].forEach(t=>{document.getElementById('tab-'+t).className=(t===f)?'mi py-3.5 rounded-xl text-[11px] font-black uppercase tracking-widest btn-fill':'mi py-3.5 rounded-xl text-[11px] font-black uppercase tracking-widest paper'});
+  const std=document.getElementById('panel-standard'),mot=document.getElementById('panel-motion');
+  if(f==='motion'){std.classList.add('hidden');mot.classList.remove('hidden');return}
+  std.classList.remove('hidden');mot.classList.add('hidden');
+  const q=document.getElementById('qty');
+  document.getElementById('slider-title').textContent=f==='horizontal'?'Duración del video':'Cantidad de videos';
+  q.max=f==='horizontal'?30:20;
+  const r=rates[f];['basic','intermediate','advanced'].forEach(t=>{document.getElementById('p-'+t).textContent=r[t];document.getElementById('u-'+t).textContent=r.unit});
+  calcTotal();
+}
+document.getElementById('qty').addEventListener('input',()=>syncSlider('qty'));
+function selectTier(t){tier=t;['basic','intermediate','advanced'].forEach(k=>document.getElementById('mark-'+k).classList.toggle('hidden',k!==t));calcTotal()}
+function calcTotal(){
+  if(fmt==='motion')return;
+  const v=parseInt(document.getElementById('qty').value),rush=document.getElementById('rush').checked;
+  document.getElementById('slider-count').textContent=fmt==='horizontal'?`${v} ${v===1?'minuto':'minutos'}`:`${v} ${v===1?'video':'videos'}`;
+  let total=v*rates[fmt][tier];if(rush)total=Math.round(total*1.3);
+  document.getElementById('total').textContent=total;
+  const subject=encodeURIComponent('Nueva cotización desde la web - MENSVA EDITOR');
+  const body=encodeURIComponent(`Hola MENSVA,\n\nQuiero cotizar un proyecto con estos detalles:\n\nFormato: ${fmt.toUpperCase()}\nNivel: ${tier.toUpperCase()}\nCantidad: ${v} ${fmt==='horizontal'?(v===1?'minuto':'minutos'):(v===1?'video':'videos')}\nPrioritario: ${rush?'Sí':'No'}\nTotal estimado: $${total} USD\n\n¿Tienes disponibilidad?`);
+  document.getElementById('wa-pricing').href=`mailto:mensvaeditor@gmail.com?subject=${subject}&body=${body}`;
+}
+
+function openVideo(u,vertical){
+  document.getElementById('lightbox-frame').src=u;
+  const box=document.getElementById('lightbox-box');
+  box.classList.toggle('max-w-3xl',!vertical);box.classList.toggle('aspect-video',!vertical);
+  box.classList.toggle('max-w-xs',!!vertical);box.classList.toggle('aspect-[9/16]',!!vertical);
+  const m=document.getElementById('lightbox');m.classList.remove('hidden');m.classList.add('flex');
+}
+function closeVideo(){document.getElementById('lightbox-frame').src='';const m=document.getElementById('lightbox');m.classList.add('hidden');m.classList.remove('flex')}
+addEventListener('keydown',e=>{if(e.key==='Escape')closeVideo()});
+
+function copyMail(){navigator.clipboard.writeText('mensvaeditor@gmail.com').catch(()=>{});const s=document.getElementById('mail-status');s.textContent='¡Copiado!';setTimeout(()=>s.textContent='Copiar correo',2000)}
+
+let lang='es';
+const dict={
+ es:{nav_work:"Portafolio",nav_timeline:"Timeline",nav_compare:"RAW vs Edit",nav_pricing:"Cotizador",nav_contact:"Contacto",nav_cta:"Cotizar",badge_kickbotpro:"Publicidad de marca",
+  hero_t1:"EDICIÓN QUE HACE",hero_t2:"TU CONTENIDO",hero_t3:"IMPOSIBLE DE IGNORAR",
+  hero_desc:"Ritmo visual, ganchos de retención y motion graphics a medida. Cada pieza sale con acabado de producción grande, no de plantilla.",
+  hero_btn_calc:"Calcular Presupuesto",hero_btn_work:"Ver Trabajos ↓",
+  stack_pr:"Edición y ritmo cinético",stack_ae:"Motion graphics 2D",stack_bl:"Render y mockups 3D",
+  work_badge:"Portafolio",work_title:"Proyectos Seleccionados",h16_badge:"Selección 16:9",h16_title:"Proyectos Horizontales",price_cta:"Consultar disponibilidad →",clients_badge:"Confían en MENSVA",clients_title:"Clientes Anteriores",clients_desc:"Creadores y canales con los que ya trabajé.",reel_title:"Piezas verticales 9:16",
+  nle_title:"Barra Táctil de Edición",nle_desc:"Mueve el cabezal o toca una etapa para ver un ejemplo real de cada fase del montaje.",
+  cmp_desc:"Arrastra la barra para comparar el material en bruto contra el acabado final.",
+  price_title:"Calcula tu Inversión",price_desc:"Precios fijos por minuto o por pieza, sin letra chica.",
+  contact_badge:"Contacto directo",contact_title:"Conectemos de Inmediato",
+  contact_desc:"Cuéntame el formato, la duración y la fecha objetivo. Respondo con propuesta y tiempos el mismo día.",
+  w_kbp_t:"Publicidad para KickBotPro",w_kbp_d:"Interfaz 3D, cortes dinámicos y diseño sonoro.",
+  w_m3d_t:"Modelo 3D en movimiento",w_m3d_d:"Elemento 3d creado en Blender",
+  w_doc_t:"Documental & Storytelling",w_doc_d:"Color, mapas animados y ritmo cine.",
+  w_r3d_t:"Renders 3D en movimiento",w_r3d_d:"Modelado, texturas y luz física.",
+  w_iyt_t:"Intros de YT",w_iyt_d:"Intros creadas en After Effects y modelos 3D en Blender.",
+  w_tae_t:"Transiciones After Effects",w_tae_d:"Transiciones dinámicas y fluidas creadas en After Effects.",
+  w_cam3d:"Cámara 3D"},
+ en:{nav_work:"Portfolio",nav_timeline:"Timeline",nav_compare:"RAW vs Edit",nav_pricing:"Estimator",nav_contact:"Contact",nav_cta:"Get Quote",badge_kickbotpro:"Brand Advertising",
+  hero_t1:"EDITING THAT MAKES",hero_t2:"YOUR CONTENT",hero_t3:"IMPOSSIBLE TO IGNORE",
+  hero_desc:"Visual pacing, retention hooks and custom motion graphics. Every piece ships with studio finish, not template finish.",
+  hero_btn_calc:"Calculate Pricing",hero_btn_work:"Explore Work ↓",
+  stack_pr:"Pacing & kinetic cuts",stack_ae:"2D motion graphics",stack_bl:"3D renders & mockups",
+  work_badge:"Portfolio",work_title:"Selected Works",h16_badge:"16:9 Selection",h16_title:"Horizontal Projects",price_cta:"Check availability →",clients_badge:"Trusted by",clients_title:"Previous Clients",clients_desc:"Creators and channels I have already worked with.",reel_title:"Vertical pieces 9:16",
+  nle_title:"Interactive Editing Bar",nle_desc:"Drag the playhead or tap a stage to see a real example of each editing phase.",
+  cmp_desc:"Drag the handle to compare raw footage against the final grade.",
+  price_title:"Calculate Your Budget",price_desc:"Flat rates per minute or per piece, no fine print.",
+  contact_badge:"Direct contact",contact_title:"Let's Connect Now",
+  contact_desc:"Tell me the format, length and target date. You'll get a proposal and timeline the same day.",
+  w_kbp_t:"KickBotPro Advertising",w_kbp_d:"3D interface, dynamic cuts and sound design.",
+  w_m3d_t:"3D Model in Motion",w_m3d_d:"3D element created in Blender",
+  w_doc_t:"Documentary & Storytelling",w_doc_d:"Color grading, animated maps and cinematic pacing.",
+  w_r3d_t:"3D Renders in Motion",w_r3d_d:"Modeling, textures and physical lighting.",
+  w_iyt_t:"YouTube Intros",w_iyt_d:"Intros made in After Effects with 3D models from Blender.",
+  w_tae_t:"After Effects Transitions",w_tae_d:"Dynamic, fluid transitions made in After Effects.",
+  w_cam3d:"3D Camera"}
+};
+function toggleLang(){lang=lang==='es'?'en':'es';document.getElementById('lang-label').textContent=lang==='es'?'EN':'ES';document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(dict[lang][k])el.textContent=dict[lang][k]})}
+
+function toggleTheme(){const h=document.documentElement,light=h.classList.toggle('light');h.classList.toggle('dark',!light);document.getElementById('ico-sun').classList.toggle('hidden',!light);document.getElementById('ico-moon').classList.toggle('hidden',light)}
+
+calcTotal();
+nleSetActive('hook');nleUpdateThumb();
+syncSlider('qty');
+</script>
+</body>
+</html>
