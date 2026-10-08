@@ -137,7 +137,7 @@ html.light .grad-text{background:linear-gradient(90deg,var(--violet),var(--orang
 .no-bar::-webkit-scrollbar{display:none}.no-bar{-ms-overflow-style:none;scrollbar-width:none}
 .marquee{overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
 .marquee-track{display:flex;gap:2.5rem;width:max-content;animation:slideLeft 24s linear infinite}
-@keyframes slideLeft{to{transform:translateX(-50%)}}
+@keyframes slideLeft{to{transform:translateX(-50% cytotoxicity)}}
 
 .scene{perspective:1100px}
 .tilt{transform-style:preserve-3d;transition:transform .5s cubic-bezier(.16,1,.3,1),box-shadow .5s}
@@ -817,7 +817,7 @@ html.light .glass{background:rgba(242,238,228,.96)!important}
         <div class="display text-5xl sm:text-6xl mt-3" style="color:#D9F500">$<span id="total">50</span><span class="text-base ml-2" style="color:#F2EEE4">USD</span></div>
         <span class="text-[11px] font-semibold opacity-70 mt-1 block">Incluye 1 ronda de ajustes y masterización final.</span>
       </div>
-      <a id="wa-pricing" href="#" class="mi w-full sm:w-auto px-8 py-4 rounded-xl font-black text-[11px] uppercase tracking-widest text-center" style="background:#D9F500;color:#18171B" data-i18n="price_cta">Consultar disponibilidad →</a>
+      <a id="wa-pricing" href="#" target="_blank" rel="noopener noreferrer" class="mi w-full sm:w-auto px-8 py-4 rounded-xl font-black text-[11px] uppercase tracking-widest text-center" style="background:#D9F500;color:#18171B" data-i18n="price_cta">Consultar disponibilidad →</a>
     </div>
   </div>
 
@@ -825,7 +825,7 @@ html.light .glass{background:rgba(242,238,228,.96)!important}
     <div class="w-16 h-16 rounded-xl mx-auto flex items-center justify-center mb-4" style="background:#5B2EFF;color:#fff"><svg class="w-8 h-8 spin-slow" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 3l7.5 4.5v9L12 21l-7.5-4.5v-9L12 3z"/><path d="M12 12l7.5-4.5M12 12v9M12 12L4.5 7.5"/></svg></div>
     <h3 class="display text-2xl uppercase mb-2">Motion Graphics 3D</h3>
     <p class="text-xs font-semibold opacity-60 max-w-md mx-auto mb-6">Cada animación de producto, comercial 3D o SaaS explainer requiere analizar modelado, físicas y guion. Se cotiza a medida.</p>
-    <a href="https://wa.me/?text=Hola%20MENSVA%2C%20quisiera%20cotizar%20un%20proyecto%20de%20Motion%20Graphics%203D" target="_blank" rel="noopener" class="mi px-8 py-4 rounded-xl btn-fill font-black text-[11px] uppercase tracking-widest inline-block">Cotizar a medida →</a>
+    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=mensvaeditor@gmail.com&su=Cotizaci%C3%B3n%20Motion%20Graphics%203D&body=Hola%20MENSVA%2C%20quisiera%20cotizar%20un%20proyecto%20de%20Motion%20Graphics%203D" target="_blank" rel="noopener noreferrer" class="mi px-8 py-4 rounded-xl btn-fill font-black text-[11px] uppercase tracking-widest inline-block">Cotizar por correo →</a>
   </div>
 </section>
 
@@ -850,22 +850,23 @@ html.light .glass{background:rgba(242,238,228,.96)!important}
     </div>
   </div>
 
-  <div class="grid grid-cols-2 sm:grid-cols-4 gap-5">
-    <button onclick="copyMail()" class="mi ico-card paper p-4 text-center r-1" style="--rr:-1.6deg">
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+    <!-- Gmail -->
+    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=mensvaeditor@gmail.com" target="_blank" rel="noopener noreferrer" onclick="copyMail()" class="mi ico-card paper p-4 text-center block r-1" style="--rr:-1.6deg">
       <div class="ico-box w-11 h-11 rounded-lg mx-auto flex items-center justify-center mb-2 display text-sm" style="background:#5B2EFF;color:#fff">@</div>
-      <span class="display text-xs block">Gmail</span><span class="text-[10px] font-semibold opacity-60" id="mail-status">Copiar correo</span>
-    </button>
-    <a href="https://twitter.com" target="_blank" rel="noopener" class="mi ico-card paper p-4 text-center block r-2" style="--rr:1.3deg">
+      <span class="display text-xs block">Gmail</span><span class="text-[10px] font-semibold opacity-60" id="mail-status">Enviar correo</span>
+    </a>
+
+    <!-- X (Twitter) -->
+    <a href="https://x.com/MensVA_Editor" target="_blank" rel="noopener noreferrer" class="mi ico-card paper p-4 text-center block r-2" style="--rr:1.3deg">
       <div class="ico-box w-11 h-11 rounded-lg mx-auto flex items-center justify-center mb-2 display text-sm" style="background:#18171B;color:#fff">𝕏</div>
-      <span class="display text-xs block">X</span><span class="text-[10px] font-semibold opacity-60">Mensaje directo</span>
+      <span class="display text-xs block">X</span><span class="text-[10px] font-semibold opacity-60">@MensVA_Editor</span>
     </a>
-    <a href="https://instagram.com" target="_blank" rel="noopener" class="mi ico-card paper p-4 text-center block r-4" style="--rr:2.2deg">
+
+    <!-- Instagram -->
+    <a href="https://www.instagram.com/mensva_/" target="_blank" rel="noopener noreferrer" class="mi ico-card paper p-4 text-center block r-4" style="--rr:2.2deg">
       <div class="ico-box w-11 h-11 rounded-lg mx-auto flex items-center justify-center mb-2 display text-sm" style="background:#FF4E23;color:#18171B">IG</div>
-      <span class="display text-xs block">Instagram</span><span class="text-[10px] font-semibold opacity-60">@mensva.editor</span>
-    </a>
-    <a href="https://wa.me/" target="_blank" rel="noopener" class="mi ico-card paper p-4 text-center block r-3" style="--rr:-2.6deg">
-      <div class="ico-box w-11 h-11 rounded-lg mx-auto flex items-center justify-center mb-2 display text-sm" style="background:#D9F500;color:#18171B">WA</div>
-      <span class="display text-xs block">WhatsApp</span><span class="text-[10px] font-semibold opacity-60">Chat directo</span>
+      <span class="display text-xs block">Instagram</span><span class="text-[10px] font-semibold opacity-60">@mensva_</span>
     </a>
   </div>
 </section>
@@ -892,7 +893,8 @@ document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
   if(!('IntersectionObserver' in window)){fr.forEach(f=>f.src=f.dataset.src);return}
   const o=new IntersectionObserver(es=>es.forEach(e=>{const f=e.target;
     if(e.isIntersecting){if(f.dataset.on!=='1'){f.src=f.dataset.src;f.dataset.on='1'}}
-    else if(f.dataset.on==='1'){f.src='about:blank';f.dataset.on='0'}}),{threshold:.3});
+    else if(f.dataset.on==='1'){f.src='about:blank';f.dataset.on='0'}
+  }),{threshold:.3});
   fr.forEach(f=>o.observe(f));
 })();
 
@@ -1085,8 +1087,8 @@ function nleTrackClick(e){if(nleDragging)return;nleSeekAtClientX(e.clientX)}
 
 function nleTogglePlay(){
   const ico=document.getElementById('nle-play-ico');
-  if(nleVideo.paused){nleVideo.play().catch(()=>{});ico.innerHTML='<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>'}
-  else{nleVideo.pause();ico.innerHTML='<path d="M8 5v14l11-7z"/>'}
+  if(nleVideo.paused){nleVideo.play().catch(()=>{});ico.innerHTML='<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>';}
+  else{nleVideo.pause();ico.innerHTML='<path d="M8 5v14l11-7z"/>';}
 }
 
 nleVideo.addEventListener('timeupdate',()=>{
@@ -1096,7 +1098,7 @@ nleVideo.addEventListener('timeupdate',()=>{
   if(k!==nleStage)nleSetActive(k);
 });
 nleVideo.addEventListener('loadedmetadata',nleUpdateThumb);
-nleVideo.addEventListener('ended',()=>{document.getElementById('nle-play-ico').innerHTML='<path d="M8 5v14l11-7z"/>'});
+nleVideo.addEventListener('ended',()=>{document.getElementById('nle-play-ico').innerHTML='<path d="M8 5v14l11-7z"/>';});
 
 function nleUpdateMuteIcon(){
   const ico=document.getElementById('nle-mute-ico'),btn=document.getElementById('nle-mute-btn');
@@ -1110,7 +1112,7 @@ function nleUpdateMuteIcon(){
 }
 function nleToggleMute(){
   nleVideo.muted=!nleVideo.muted;
-  if(!nleVideo.muted && nleVideo.volume===0){nleVideo.volume=.8;document.getElementById('nle-vol-slider').value=80}
+  if(!nleVideo.muted && nleVideo.volume===0){nleVideo.volume=.8;document.getElementById('nle-vol-slider').value=80;}
   nleUpdateMuteIcon();
 }
 function nleSetVolume(v){
@@ -1120,37 +1122,41 @@ function nleSetVolume(v){
 }
 nleUpdateMuteIcon();
 
-nleThumb.addEventListener('pointerdown',e=>{nleDragging=true;nleThumb.setPointerCapture(e.pointerId);e.stopPropagation()});
-nleThumb.addEventListener('pointermove',e=>{if(!nleDragging)return;nleSeekAtClientX(e.clientX)});
-['pointerup','pointercancel'].forEach(evt=>nleThumb.addEventListener(evt,()=>{if(!nleDragging)return;nleDragging=false;nleVideo.play().catch(()=>{})}));
+nleThumb.addEventListener('pointerdown',e=>{nleDragging=true;nleThumb.setPointerCapture(e.pointerId);e.stopPropagation();});
+nleThumb.addEventListener('pointermove',e=>{if(!nleDragging)return;nleSeekAtClientX(e.clientX);});
+['pointerup','pointercancel'].forEach(evt=>nleThumb.addEventListener(evt,()=>{if(!nleDragging)return;nleDragging=false;nleVideo.play().catch(()=>{});}));
 
-function updateSplit(v){document.getElementById('raw-overlay').style.clipPath=`inset(0 ${100-v}% 0 0)`;document.getElementById('split-handle').style.left=v+'%'}
+function updateSplit(v){document.getElementById('raw-overlay').style.clipPath=`inset(0 ${100-v}% 0 0)`;document.getElementById('split-handle').style.left=v+'%';}
 
 let fmt='horizontal',tier='basic';
 const rates={horizontal:{basic:10,intermediate:15,advanced:25,unit:'/ min'},vertical:{basic:17,intermediate:25,advanced:60,unit:'/ video'}};
 function switchFormat(f){
   fmt=f;
-  ['horizontal','vertical','motion'].forEach(t=>{document.getElementById('tab-'+t).className=(t===f)?'mi py-3.5 rounded-xl text-[11px] font-black uppercase tracking-widest btn-fill':'mi py-3.5 rounded-xl text-[11px] font-black uppercase tracking-widest paper'});
+  ['horizontal','vertical','motion'].forEach(t=>{document.getElementById('tab-'+t).className=(t===f)?'mi py-3.5 rounded-xl text-[11px] font-black uppercase tracking-widest btn-fill':'mi py-3.5 rounded-xl text-[11px] font-black uppercase tracking-widest paper';});
   const std=document.getElementById('panel-standard'),mot=document.getElementById('panel-motion');
-  if(f==='motion'){std.classList.add('hidden');mot.classList.remove('hidden');return}
+  if(f==='motion'){std.classList.add('hidden');mot.classList.remove('hidden');return;}
   std.classList.remove('hidden');mot.classList.add('hidden');
   const q=document.getElementById('qty');
   document.getElementById('slider-title').textContent=f==='horizontal'?'Duración del video':'Cantidad de videos';
   q.max=f==='horizontal'?30:20;
-  const r=rates[f];['basic','intermediate','advanced'].forEach(t=>{document.getElementById('p-'+t).textContent=r[t];document.getElementById('u-'+t).textContent=r.unit});
+  const r=rates[f];['basic','intermediate','advanced'].forEach(t=>{document.getElementById('p-'+t).textContent=r[t];document.getElementById('u-'+t).textContent=r.unit;});
   calcTotal();
 }
 document.getElementById('qty').addEventListener('input',()=>syncSlider('qty'));
-function selectTier(t){tier=t;['basic','intermediate','advanced'].forEach(k=>document.getElementById('mark-'+k).classList.toggle('hidden',k!==t));calcTotal()}
+function selectTier(t){tier=t;['basic','intermediate','advanced'].forEach(k=>document.getElementById('mark-'+k).classList.toggle('hidden',k!==t));calcTotal();}
+
 function calcTotal(){
   if(fmt==='motion')return;
   const v=parseInt(document.getElementById('qty').value),rush=document.getElementById('rush').checked;
   document.getElementById('slider-count').textContent=fmt==='horizontal'?`${v} ${v===1?'minuto':'minutos'}`:`${v} ${v===1?'video':'videos'}`;
   let total=v*rates[fmt][tier];if(rush)total=Math.round(total*1.3);
   document.getElementById('total').textContent=total;
+
   const subject=encodeURIComponent('Nueva cotización desde la web - MENSVA EDITOR');
   const body=encodeURIComponent(`Hola MENSVA,\n\nQuiero cotizar un proyecto con estos detalles:\n\nFormato: ${fmt.toUpperCase()}\nNivel: ${tier.toUpperCase()}\nCantidad: ${v} ${fmt==='horizontal'?(v===1?'minuto':'minutos'):(v===1?'video':'videos')}\nPrioritario: ${rush?'Sí':'No'}\nTotal estimado: $${total} USD\n\n¿Tienes disponibilidad?`);
-  document.getElementById('wa-pricing').href=`mailto:mensvaeditor@gmail.com?subject=${subject}&body=${body}`;
+  
+  // Abre el redactor de Gmail en una pestaña nueva con el correo y cotización cargados
+  document.getElementById('wa-pricing').href=`https://mail.google.com/mail/?view=cm&fs=1&to=mensvaeditor@gmail.com&su=${subject}&body=${body}`;
 }
 
 function openVideo(u,vertical){
@@ -1160,10 +1166,10 @@ function openVideo(u,vertical){
   box.classList.toggle('max-w-xs',!!vertical);box.classList.toggle('aspect-[9/16]',!!vertical);
   const m=document.getElementById('lightbox');m.classList.remove('hidden');m.classList.add('flex');
 }
-function closeVideo(){document.getElementById('lightbox-frame').src='';const m=document.getElementById('lightbox');m.classList.add('hidden');m.classList.remove('flex')}
-addEventListener('keydown',e=>{if(e.key==='Escape')closeVideo()});
+function closeVideo(){document.getElementById('lightbox-frame').src='';const m=document.getElementById('lightbox');m.classList.add('hidden');m.classList.remove('flex');}
+addEventListener('keydown',e=>{if(e.key==='Escape')closeVideo();});
 
-function copyMail(){navigator.clipboard.writeText('mensvaeditor@gmail.com').catch(()=>{});const s=document.getElementById('mail-status');s.textContent='¡Copiado!';setTimeout(()=>s.textContent='Copiar correo',2000)}
+function copyMail(){navigator.clipboard.writeText('mensvaeditor@gmail.com').catch(()=>{});const s=document.getElementById('mail-status');s.textContent='¡Copiado!';setTimeout(()=>s.textContent='Enviar correo',2000);}
 
 let lang='es';
 const dict={
@@ -1204,9 +1210,9 @@ const dict={
   w_tae_t:"After Effects Transitions",w_tae_d:"Dynamic, fluid transitions made in After Effects.",
   w_cam3d:"3D Camera"}
 };
-function toggleLang(){lang=lang==='es'?'en':'es';document.getElementById('lang-label').textContent=lang==='es'?'EN':'ES';document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(dict[lang][k])el.textContent=dict[lang][k]})}
+function toggleLang(){lang=lang==='es'?'en':'es';document.getElementById('lang-label').textContent=lang==='es'?'EN':'ES';document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(dict[lang][k])el.textContent=dict[lang][k];});}
 
-function toggleTheme(){const h=document.documentElement,light=h.classList.toggle('light');h.classList.toggle('dark',!light);document.getElementById('ico-sun').classList.toggle('hidden',!light);document.getElementById('ico-moon').classList.toggle('hidden',light)}
+function toggleTheme(){const h=document.documentElement,light=h.classList.toggle('light');h.classList.toggle('dark',!light);document.getElementById('ico-sun').classList.toggle('hidden',!light);document.getElementById('ico-moon').classList.toggle('hidden',light);}
 
 calcTotal();
 nleSetActive('hook');nleUpdateThumb();
